@@ -1,11 +1,13 @@
 package com.example.airman;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -107,6 +109,7 @@ public class AirlineManagement extends Application {
 
     public GridPane airplane() {
         GridPane airplane = new GridPane();
+        airplane.setPadding(new Insets(20, 20, 20, 20));
         airplane.setHgap(70);
         airplane.setVgap(70);
 
