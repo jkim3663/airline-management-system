@@ -10,6 +10,32 @@ public class DatabaseConnect {
     private static String username = "root";
     private static String password = "josh0205";
 
+    public static void usedAddAirport(String airportID, String airportName, String city, String state, String locationID) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection(url, username, password);
+            //here flight_management is database name, root is username and password
+            String query = "{CALL add_airport(?, ?, ?, ?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, airportID);
+            stmt.setString(2, airportName);
+            stmt.setString(3, city);
+            stmt.setString(4, state);
+            stmt.setString(5, locationID);
+
+            System.out.println("HELLO CONNECTED COMPLETE");
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+
     public static void useAddAirplane(String airplaneID, String tailNum, int seatCap, int speed, String locationID,
                                       String planeType, Object skids, Object propellers, Object jetEngines) {
         try {

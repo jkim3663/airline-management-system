@@ -16,7 +16,7 @@ import java.util.List;
 import com.example.airman.DatabaseConnect;
 
 
-public class AirlineManagement extends Application {
+public class Airline extends Application {
     // 0: main menu scene
     // 1: Airplane menu scene
     public static List<Scene> sceneList = new ArrayList<Scene>();
@@ -101,14 +101,123 @@ public class AirlineManagement extends Application {
         GridPane airplanePane = airplane();
         Scene airplaneScene = new Scene(airplanePane, 720, 480);
 
+        GridPane airportPane = airport();
+        Scene airportScene = new Scene(airportPane, 720, 480);
+
         // idx 1: airplaneScene
         sceneList.add(airplaneScene);
+
+        // idx 5: airportScene
+        sceneList.add(airportScene);
+
 
 
         Stage primaryStage = stageList.get(0);
         airplanes.setOnAction(e -> primaryStage.setScene(airplaneScene));
+        airports.setOnAction(e -> primaryStage.setScene(airportScene));
 
         return menu;
+    }
+
+    public GridPane airport() {
+        GridPane airport = new GridPane();
+        airport.setPadding(new Insets(20, 20, 20, 20));
+        airport.setHgap(70);
+        airport.setVgap(70);
+
+        Button add_airport = new Button("Add Airport");
+        add_airport.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airport.addRow(0, add_airport);
+        airport.addRow(1, returnBtn);
+
+        GridPane addAirportPane = addAirportPane();
+        Scene addAirportScene = new Scene(addAirportPane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        add_airport.setOnAction(e -> primaryStage.setScene(addAirportScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return airport;
+    }
+
+    public GridPane addAirportPane() {
+        GridPane addAirportPane = new GridPane();
+        addAirportPane.setPadding(new Insets(20, 20, 20, 20));
+        addAirportPane.setHgap(70);
+        addAirportPane.setVgap(30);
+
+        HBox row1 = new HBox(20);
+        Label airportID = new Label("airportID");
+        TextField airportType = new TextField();
+
+        row1.getChildren().addAll(airportID, airportType);
+
+        HBox row2 = new HBox(20);
+        Label airportName = new Label("airport_name");
+        TextField airportNameType = new TextField();
+
+        row2.getChildren().addAll(airportName, airportNameType);
+
+        HBox row3 = new HBox(20);
+        Label city = new Label("City");
+        TextField cityType = new TextField();
+
+        row3.getChildren().addAll(city, cityType);
+
+        HBox row4 = new HBox(20);
+        Label state = new Label("State");
+        TextField stateType = new TextField();
+
+        row4.getChildren().addAll(state, stateType);
+
+        HBox row5 = new HBox(20);
+        Label locID = new Label("location_id");
+        MenuButton locMenu = new MenuButton();
+        ArrayList<String> locList = DatabaseConnect.getLocationID();
+        for (int i = 0; i < locList.size(); i++) {
+            MenuItem locItem = new MenuItem(locList.get(i));
+            locItem.setOnAction(e -> locMenu.setText(locItem.getText()));
+            locMenu.getItems().add(locItem);
+        }
+
+        row5.getChildren().addAll(locID, locMenu);
+
+        HBox row6 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(airplane()));
+
+        Button callAddAirport = new Button("Add");
+        callAddAirport.setPrefSize(200, 50);
+        callAddAirport.setOnAction(e -> {
+
+            // airportType, airportNameType, cityType, stateType, locMenu
+            String str_airportID = airportType.getText();
+            String str_airportName = airportNameType.getText();
+            String str_city = cityType.getText();
+            String str_state = stateType.getText();
+            String str_locID = locMenu.getText();
+
+
+            DatabaseConnect.usedAddAirport(str_airportID, str_airportName, str_city, str_state, str_locID);
+        });
+
+        row6.getChildren().addAll(cancel, callAddAirport);
+
+
+        addAirportPane.addRow(0, row1);
+        addAirportPane.addRow(1, row2);
+        addAirportPane.addRow(2, row3);
+        addAirportPane.addRow(3, row4);
+        addAirportPane.addRow(4, row5);
+        addAirportPane.addRow(5, row6);
+
+
+        return addAirportPane;
     }
 
     public GridPane airplane() {
@@ -219,7 +328,7 @@ public class AirlineManagement extends Application {
             int speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
             Object jet_engines = jetNum.getText().equals("") ? null :Integer.parseInt(jetNum.getText());
             String location_id = locMenu.getText();
-            
+
 
             DatabaseConnect.useAddAirplane(airplaneID, tail_num, seat_capacity, speedVal, location_id, plane_type,
                     skidVal, propVal, jet_engines);
@@ -242,4 +351,3 @@ public class AirlineManagement extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-}
