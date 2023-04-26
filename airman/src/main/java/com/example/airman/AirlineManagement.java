@@ -201,6 +201,29 @@ public class AirlineManagement extends Application {
 
         Button callAddAirplane = new Button("Add");
         callAddAirplane.setPrefSize(200, 50);
+        callAddAirplane.setOnAction(e -> {
+            String airplaneID = aIDList.getText();
+            String plane_type = pType.getText();
+            String tail_num = tNum.getText();
+            String getSkidText = skidText.getText();
+            Object skidVal;
+            if ( getSkidText.equals("True") || getSkidText.equals("true") || getSkidText.equals("TRUE") ) {
+                skidVal = true;
+            } else if (getSkidText.equals("False") || getSkidText.equals("false") || getSkidText.equals("FALSE")) {
+                skidVal = false;
+            } else {
+                skidVal = null;
+            }
+            int seat_capacity = Integer.parseInt(seatCapNum.getText());
+            Object propVal = prop.getText().equals("") ? null : Integer.parseInt(prop.getText());
+            int speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
+            Object jet_engines = jetNum.getText().equals("") ? null :Integer.parseInt(jetNum.getText());
+            String location_id = locMenu.getText();
+            
+
+            DatabaseConnect.useAddAirplane(airplaneID, tail_num, seat_capacity, speedVal, location_id, plane_type,
+                    skidVal, propVal, jet_engines);
+        });
 
         row6.getChildren().addAll(cancel, callAddAirplane);
 
