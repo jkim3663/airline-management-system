@@ -10,6 +10,10 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +26,7 @@ public class AirlineManagement extends Application {
     public static List<Scene> sceneList = new ArrayList<Scene>();
     // 0: primaryStage
     public static List<Stage> stageList = new ArrayList<Stage>();
+
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -62,6 +67,7 @@ public class AirlineManagement extends Application {
 
         primaryStage.show();
     }
+
 
     public GridPane menuScene() {
         GridPane menu = new GridPane();
@@ -135,6 +141,7 @@ public class AirlineManagement extends Application {
 
         return airplane;
     }
+
 
     public GridPane addAirplanePane () {
         GridPane addAirplanePane = new GridPane();
@@ -214,15 +221,34 @@ public class AirlineManagement extends Application {
             } else {
                 skidVal = null;
             }
-            int seat_capacity = Integer.parseInt(seatCapNum.getText());
-            Object propVal = prop.getText().equals("") ? null : Integer.parseInt(prop.getText());
-            int speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
-            Object jet_engines = jetNum.getText().equals("") ? null :Integer.parseInt(jetNum.getText());
-            String location_id = locMenu.getText();
-            
+            try {
+                int seat_capacity = Integer.parseInt(seatCapNum.getText());
+                Object propVal = prop.getText().equals("") ? null : Integer.parseInt(prop.getText());
+                int speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
+                Object jet_engines = jetNum.getText().equals("") ? null : Integer.parseInt(jetNum.getText());
+                String location_id = locMenu.getText();
 
-            DatabaseConnect.useAddAirplane(airplaneID, tail_num, seat_capacity, speedVal, location_id, plane_type,
-                    skidVal, propVal, jet_engines);
+
+                DatabaseConnect.useAddAirplane(airplaneID, tail_num, seat_capacity, speedVal, location_id, plane_type,
+                        skidVal, propVal, jet_engines);
+
+                Alert a = new Alert(Alert.AlertType.NONE);
+                // set alert type
+                a.setAlertType(Alert.AlertType.CONFIRMATION);
+                a.setContentText("View airplane table to check the update");
+
+                // show the dialog
+                a.show();
+            } catch (Exception exception) {
+                Alert a = new Alert(Alert.AlertType.NONE);
+                // set alert type
+                a.setAlertType(Alert.AlertType.ERROR);
+                a.setContentText("Retry with correct format");
+
+                // show the dialog
+                a.show();
+            }
+
         });
 
         row6.getChildren().addAll(cancel, callAddAirplane);

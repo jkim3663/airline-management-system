@@ -10,13 +10,22 @@ public class DatabaseConnect {
     private static String username = "root";
     private static String password = "josh0205";
 
-    public static void useAddAirplane(String airplaneID, String tailNum, int seatCap, int speed, String locationID,
-                                      String planeType, Object skids, Object propellers, Object jetEngines) {
+    public static Connection connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             Connection con = DriverManager.getConnection(
                     "jdbc:mysql://localhost:3306/flight_management", "root", "josh0205");
-            //here flight_management is database name, root is username and password
+            return con;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    public static void useAddAirplane(String airplaneID, String tailNum, int seatCap, int speed, String locationID,
+                                      String planeType, Object skids, Object propellers, Object jetEngines) {
+        Connection con = connect();
+        try {
             String query = "{CALL add_airplane(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
             CallableStatement stmt = con.prepareCall(query);
 
@@ -53,12 +62,8 @@ public class DatabaseConnect {
 
     public static ArrayList<String> getLocationID() {
         ArrayList<String> arr = new ArrayList<>();
-
+        Connection con = connect();
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/flight_management", "root", "josh0205");
-            //here flight_management is database name, root is username and password
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("select * from location");
             while (rs.next()) {
@@ -71,24 +76,6 @@ public class DatabaseConnect {
         }
 
         return arr;
-    }
-
-    public static void test() {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/flight_management", "root", "josh0205");
-            //here sonoo is database name, root is username and password
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery("select * from location");
-            while (rs.next()) {
-                System.out.println(rs.getString("locationID"));
-            }
-
-            con.close();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
     }
 
     public static void main(String[] args) {
