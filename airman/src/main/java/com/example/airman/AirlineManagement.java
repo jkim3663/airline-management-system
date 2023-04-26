@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.airman.DatabaseConnect;
+
 
 public class AirlineManagement extends Application {
     // 0: main menu scene
@@ -176,8 +178,14 @@ public class AirlineManagement extends Application {
         HBox row5 = new HBox(20);
         Label locID = new Label("location_id");
         MenuButton locMenu = new MenuButton();
+        ArrayList<String> locList = DatabaseConnect.getLocationID();
+        for (int i = 0; i < locList.size(); i++) {
+            MenuItem locItem = new MenuItem(locList.get(i));
+            locItem.setOnAction(e -> locMenu.setText(locItem.getText()));
+            locMenu.getItems().add(locItem);
+        }
 
-        row4.getChildren().addAll(speedLabel, speedNum, jetEngines, jetNum);
+        row5.getChildren().addAll(locID, locMenu);
 
 
         for (int i = 0; i < aIDList.getItems().size(); i++) {
@@ -190,6 +198,7 @@ public class AirlineManagement extends Application {
         addAirplanePane.addRow(1, row2);
         addAirplanePane.addRow(2, row3);
         addAirplanePane.addRow(3, row4);
+        addAirplanePane.addRow(4, row5);
 
 
         return addAirplanePane;
