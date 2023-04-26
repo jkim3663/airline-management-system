@@ -19,9 +19,9 @@ import com.example.airman.DatabaseConnect;
 public class AirlineManagement extends Application {
     // 0: main menu scene
     // 1: Airplane menu scene
-    private static List<Scene> sceneList = new ArrayList<Scene>();
+    public static List<Scene> sceneList = new ArrayList<Scene>();
     // 0: primaryStage
-    private static List<Stage> stageList = new ArrayList<Stage>();
+    public static List<Stage> stageList = new ArrayList<Stage>();
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -104,6 +104,7 @@ public class AirlineManagement extends Application {
         // idx 1: airplaneScene
         sceneList.add(airplaneScene);
 
+
         Stage primaryStage = stageList.get(0);
         airplanes.setOnAction(e -> primaryStage.setScene(airplaneScene));
 
@@ -119,7 +120,8 @@ public class AirlineManagement extends Application {
         Button add_airplane = new Button("Add Airplane");
         add_airplane.setPrefSize(200, 50);
 
-        Button returnBtn = returnButton(0);
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
 
         airplane.addRow(0, add_airplane);
         airplane.addRow(1, returnBtn);
@@ -129,6 +131,7 @@ public class AirlineManagement extends Application {
 
         Stage primaryStage = stageList.get(0);
         add_airplane.setOnAction(e -> primaryStage.setScene(addAirplaneScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
 
         return airplane;
     }
@@ -150,6 +153,10 @@ public class AirlineManagement extends Application {
         TextField pType = new TextField();
 
         row1.getChildren().addAll(aID, aIDList, planeType, pType);
+        for (int i = 0; i < aIDList.getItems().size(); i++) {
+            MenuItem curr = aIDList.getItems().get(i);
+            curr.setOnAction(e -> aIDList.setText(curr.getText()));
+        }
 
         HBox row2 = new HBox(20);
         Label tailNum = new Label("tail_num");
@@ -187,11 +194,15 @@ public class AirlineManagement extends Application {
 
         row5.getChildren().addAll(locID, locMenu);
 
+        HBox row6 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(airplane()));
 
-        for (int i = 0; i < aIDList.getItems().size(); i++) {
-            MenuItem curr = aIDList.getItems().get(i);
-            curr.setOnAction(e -> aIDList.setText(curr.getText()));
-        }
+        Button callAddAirplane = new Button("Add");
+        callAddAirplane.setPrefSize(200, 50);
+
+        row6.getChildren().addAll(cancel, callAddAirplane);
 
 
         addAirplanePane.addRow(0, row1);
@@ -199,23 +210,13 @@ public class AirlineManagement extends Application {
         addAirplanePane.addRow(2, row3);
         addAirplanePane.addRow(3, row4);
         addAirplanePane.addRow(4, row5);
+        addAirplanePane.addRow(5, row6);
 
 
         return addAirplanePane;
     }
 
-    /**
-     * A return button that can be used for all pages to go back to the main menu
-     */
-    public Button returnButton(int idx) {
-        Button returnBtn = new Button("Return to main menu");
-        returnBtn.setPrefSize(200, 50);
-
-        Stage primaryStage = stageList.get(idx);
-        returnBtn.setOnAction(e -> primaryStage.setScene(sceneList.get(0)));
-
-        return returnBtn;
+    public static void main(String[] args) {
+        launch(args);
     }
-
-    public static void main(String[] args) { launch(args); }
 }
