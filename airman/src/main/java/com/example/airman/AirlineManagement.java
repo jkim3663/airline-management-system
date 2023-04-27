@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -107,14 +108,466 @@ public class AirlineManagement extends Application {
         GridPane airplanePane = airplane();
         Scene airplaneScene = new Scene(airplanePane, 720, 480);
 
-        // idx 1: airplaneScene
-        sceneList.add(airplaneScene);
+        GridPane pilotPane = pilot();
+        Scene pilotScene = new Scene(pilotPane, 720, 480);
 
+        GridPane peoplePane = people();
+        Scene peopleScene = new Scene(peoplePane, 720, 480);
+
+        GridPane airportPane = airport();
+        Scene airportScene = new Scene(airportPane, 720, 480);
+
+        GridPane flightPane = flight();
+        Scene flightScene = new Scene(flightPane, 720, 480);
+
+        sceneList.add(airplaneScene);       // idx 1: airplaneScene
+        sceneList.add(pilotScene);          // idx 2: pilotScene
+        sceneList.add(peopleScene);         // idx 3: personScene
+        sceneList.add(airportScene);        // idx 5: airportScene
 
         Stage primaryStage = stageList.get(0);
         airplanes.setOnAction(e -> primaryStage.setScene(airplaneScene));
+        airports.setOnAction(e -> primaryStage.setScene(airportScene));
+        people.setOnAction(e -> primaryStage.setScene(peopleScene));
+        pilots.setOnAction(e -> primaryStage.setScene(pilotScene));
+        flights.setOnAction(e -> primaryStage.setScene(flightScene));
 
         return menu;
+    }
+
+    public GridPane flight() {
+        GridPane flight = new GridPane();
+        flight.setPadding(new Insets(20, 20, 20, 20));
+        flight.setHgap(70);
+        flight.setVgap(70);
+
+        Button offer_flight = new Button("Offer Flight");
+        offer_flight.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        flight.addRow(0, offer_flight);
+        flight.addRow(1, returnBtn);
+
+        GridPane offerFlightPane = offerFlightPane();
+        Scene offerFlightScene = new Scene(offerFlightPane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        offer_flight.setOnAction(e -> primaryStage.setScene(offerFlightScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return flight;
+    }
+
+    public GridPane offerFlightPane() {
+        GridPane offerFlightPane = new GridPane();
+        offerFlightPane.setPadding(new Insets(20, 20, 20, 20));
+        offerFlightPane.setHgap(70);
+        offerFlightPane.setVgap(30);
+
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        TextField flightType = new TextField();
+
+        Label supportTail = new Label("support_tail");
+        TextField supportTailType = new TextField();
+
+        row1.getChildren().addAll(flightID, flightType, supportTail, supportTailType);
+
+        HBox row2 = new HBox(20);
+        Label routeID = new Label("routeID");
+        TextField routeIDType = new TextField();
+
+        Label progress = new Label("progress");
+        TextField progressType = new TextField();
+
+        row2.getChildren().addAll(routeID, routeIDType, progress, progressType);
+
+        HBox row3 = new HBox(20);
+        Label supportAirline = new Label("support_airline");
+        MenuButton airlineMenu = new MenuButton();
+        ArrayList<String> airlineList = DatabaseConnect.getSupportAirline();
+        for (int i = 0; i < airlineList.size(); i++) {
+            MenuItem airlineItem = new MenuItem(airlineList.get(i));
+            airlineItem.setOnAction(e -> airlineMenu.setText(airlineItem.getText()));
+            airlineMenu.getItems().add(airlineItem);
+        }
+
+        Label airplaneStatus = new Label("airplane_status");
+        MenuButton aStatusMenu = new MenuButton();
+        MenuItem inGround = new MenuItem("in_ground");
+        inGround.setOnAction(e -> aStatusMenu.setText(inGround.getText()));
+        MenuItem onGround = new MenuItem("on_ground");
+        onGround.setOnAction(e -> aStatusMenu.setText(onGround.getText()));
+        aStatusMenu.getItems().addAll(inGround, onGround);
+
+        row3.getChildren().addAll(supportAirline, airlineMenu, airplaneStatus, aStatusMenu);
+
+        HBox row4 = new HBox(20);
+        Label nextTime = new Label("next_time");
+        TextField nextTimeType = new TextField();
+
+
+        row4.getChildren().addAll(nextTime, nextTimeType);
+
+        HBox row5 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(pilot()));
+
+        Button callAddPerson = new Button("Add");
+        callAddPerson.setPrefSize(200, 50);
+        callAddPerson.setOnAction(e -> {
+
+            try {
+                Object str_flightID = flightType.getText().equals("") ? null : flightType.getText();
+                Object str_supportTail = supportTailType.getText().equals("") ? null : supportTailType.getText();
+                Object str_routeID = routeIDType.getText().equals("") ? null : routeIDType.getText();
+                Object int_progress = progressType.getText().equals("") ? null : Integer.parseInt(progressType.getText());
+                Object str_supportAirline = airlineMenu.getText().equals("") ? null : airlineMenu.getText();
+                Object str_airplaneStatus = aStatusMenu.getText().equals("") ? null : aStatusMenu.getText();
+                Object str_nextTime = nextTimeType.getText().equals("") ? null : nextTimeType.getText();
+
+                System.out.println("Status: " + (String) str_airplaneStatus);
+
+                DatabaseConnect.usedOfferFlight(str_flightID, str_supportTail, str_routeID, int_progress, str_supportAirline, str_airplaneStatus, str_nextTime);
+                alert(0, "View pilot_licenses Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct grant_pilot_license form");
+            }
+
+        });
+
+        row5.getChildren().addAll(cancel, callAddPerson);
+
+
+        offerFlightPane.addRow(0, row1);
+        offerFlightPane.addRow(1, row2);
+        offerFlightPane.addRow(2, row3);
+        offerFlightPane.addRow(3, row4);
+        offerFlightPane.addRow(4, row5);
+
+        return offerFlightPane;
+    }
+
+    public GridPane pilot() {
+        GridPane pilot = new GridPane();
+        pilot.setPadding(new Insets(20, 20, 20, 20));
+        pilot.setHgap(70);
+        pilot.setVgap(70);
+
+        Button grant_pilot = new Button("Grant Pilot License");
+        grant_pilot.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        pilot.addRow(0, grant_pilot);
+        pilot.addRow(1, returnBtn);
+
+        GridPane grantPilotPane = grantPilotPane();
+        Scene grantPilotScene = new Scene(grantPilotPane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        grant_pilot.setOnAction(e -> primaryStage.setScene(grantPilotScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return pilot;
+    }
+
+    public GridPane grantPilotPane() {
+        GridPane grantPilotPane = new GridPane();
+        grantPilotPane.setPadding(new Insets(20, 20, 20, 20));
+        grantPilotPane.setHgap(70);
+        grantPilotPane.setVgap(30);
+
+
+        HBox row1 = new HBox(20);
+        Label personID = new Label("personID");
+        MenuButton personMenu = new MenuButton();
+        ArrayList<String> personList = DatabaseConnect.getPersonID();
+        for (int i = 0; i < personList.size(); i++) {
+            MenuItem personItem = new MenuItem(personList.get(i));
+            personItem.setOnAction(e -> personMenu.setText(personItem.getText()));
+            personMenu.getItems().add(personItem);
+        }
+
+        row1.getChildren().addAll(personID, personMenu);
+
+
+        HBox row2 = new HBox(20);
+        Label license = new Label("License type");
+        MenuButton licenseMenu = new MenuButton();
+        ArrayList<String> licenseList = DatabaseConnect.getLicenseType();
+        for (int i = 0; i < licenseList.size(); i++) {
+            MenuItem licItem = new MenuItem(licenseList.get(i));
+            licItem.setOnAction(e -> licenseMenu.setText(licItem.getText()));
+            licenseMenu.getItems().add(licItem);
+        }
+
+        row2.getChildren().addAll(license, licenseMenu);
+
+        HBox row3 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(pilot()));
+
+        Button callAddPerson = new Button("Add");
+        callAddPerson.setPrefSize(200, 50);
+        callAddPerson.setOnAction(e -> {
+
+            try {
+                Object str_personID = personMenu.getText();
+                Object type_license = licenseMenu.getText();
+
+                DatabaseConnect.usedGrantPilotLicense(str_personID, type_license);
+                alert(0, "View pilot_licenses Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct grant_pilot_license form");
+            }
+
+        });
+
+        row3.getChildren().addAll(cancel, callAddPerson);
+
+
+        grantPilotPane.addRow(0, row1);
+        grantPilotPane.addRow(1, row2);
+        grantPilotPane.addRow(2, row3);
+
+        return grantPilotPane;
+    }
+
+    public GridPane people() {
+        GridPane people = new GridPane();
+        people.setPadding(new Insets(20, 20, 20, 20));
+        people.setHgap(70);
+        people.setVgap(70);
+
+        Button add_person = new Button("Add People");
+        add_person.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        people.addRow(0, add_person);
+        people.addRow(1, returnBtn);
+
+        GridPane addPeoplePane = addPeoplePane();
+        Scene addPeopleScene = new Scene(addPeoplePane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        add_person.setOnAction(e -> primaryStage.setScene(addPeopleScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return people;
+    }
+
+    public GridPane addPeoplePane() {
+        GridPane addPeoplePane = new GridPane();
+        addPeoplePane.setPadding(new Insets(20, 20, 20, 20));
+        addPeoplePane.setHgap(70);
+        addPeoplePane.setVgap(30);
+
+        HBox row1 = new HBox(20);
+        Label personID = new Label("personID");
+        TextField personIDType = new TextField();
+
+        Label experience = new Label("experience");
+        TextField exp_type = new TextField();
+
+        row1.getChildren().addAll(personID, personIDType, experience, exp_type);
+
+        HBox row2 = new HBox(20);
+        Label first_name = new Label("first_name");
+        TextField first_nameType = new TextField();
+
+        Label airline = new Label("airline");
+        TextField airlineType = new TextField();
+
+        row2.getChildren().addAll(first_name, first_nameType, airline, airlineType);
+
+        HBox row3 = new HBox(20);
+        Label last_name = new Label("last_name");
+        TextField last_nameType = new TextField();
+
+        Label tail = new Label("tail");
+        TextField tailType = new TextField();
+
+        row3.getChildren().addAll(last_name, last_nameType, tail, tailType);
+
+        HBox row4 = new HBox(20);
+        Label tax = new Label("taxID");
+        TextField taxType = new TextField();
+
+        Label miles = new Label("miles");
+        TextField milesType = new TextField();
+
+        row4.getChildren().addAll(tax, taxType, miles, milesType);
+
+        HBox row5 = new HBox(20);
+        Label locID = new Label("location_id");
+        MenuButton locMenu = new MenuButton();
+        ArrayList<String> locList = DatabaseConnect.getLocationID();
+        for (int i = 0; i < locList.size(); i++) {
+            MenuItem locItem = new MenuItem(locList.get(i));
+            locItem.setOnAction(e -> locMenu.setText(locItem.getText()));
+            locMenu.getItems().add(locItem);
+        }
+
+        row5.getChildren().addAll(locID, locMenu);
+
+        HBox row6 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(people()));
+
+        Button callAddPerson = new Button("Add");
+        callAddPerson.setPrefSize(200, 50);
+        callAddPerson.setOnAction(e -> {
+
+            try {
+                Object str_personID = personIDType.getText().equals("") ? null : personIDType.getText();
+                Object int_exp = exp_type.getText().equals("") ? null : Integer.parseInt(exp_type.getText());
+                Object str_firstname = first_nameType.getText().equals("") ? null : first_nameType.getText();
+                Object str_airline = airlineType.getText().equals("") ? null : airlineType.getText();
+                Object str_lastname = last_nameType.getText().equals("") ? null : last_nameType.getText();
+                Object str_tail = tailType.getText().equals("") ? null : tailType.getText();
+                Object str_tax = taxType.getText().equals("") ? null : taxType.getText();
+                Object int_mile = milesType.getText().equals("") ? null : Integer.parseInt(milesType.getText());
+                Object location_id = locMenu.getText().equals("") ? null : locMenu.getText();
+
+
+                DatabaseConnect.useAddPerson(str_personID, str_firstname, str_lastname, location_id, str_tax,
+                        int_exp, str_airline, str_tail, int_mile);
+                alert(0, "View Person Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct add_person form");
+            }
+
+        });
+
+        row6.getChildren().addAll(cancel, callAddPerson);
+
+
+        addPeoplePane.addRow(0, row1);
+        addPeoplePane.addRow(1, row2);
+        addPeoplePane.addRow(2, row3);
+        addPeoplePane.addRow(3, row4);
+        addPeoplePane.addRow(4, row5);
+        addPeoplePane.addRow(5, row6);
+
+
+        return addPeoplePane;
+    }
+
+    public GridPane airport() {
+        GridPane airport = new GridPane();
+        airport.setPadding(new Insets(20, 20, 20, 20));
+        airport.setHgap(70);
+        airport.setVgap(70);
+
+        Button add_airport = new Button("Add Airport");
+        add_airport.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airport.addRow(0, add_airport);
+        airport.addRow(1, returnBtn);
+
+        GridPane addAirportPane = addAirportPane();
+        Scene addAirportScene = new Scene(addAirportPane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        add_airport.setOnAction(e -> primaryStage.setScene(addAirportScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return airport;
+    }
+
+    public GridPane addAirportPane() {
+        GridPane addAirportPane = new GridPane();
+        addAirportPane.setPadding(new Insets(20, 20, 20, 20));
+        addAirportPane.setHgap(70);
+        addAirportPane.setVgap(30);
+
+        HBox row1 = new HBox(20);
+        Label airportID = new Label("airportID");
+        TextField airportType = new TextField();
+
+        row1.getChildren().addAll(airportID, airportType);
+
+        HBox row2 = new HBox(20);
+        Label airportName = new Label("airport_name");
+        TextField airportNameType = new TextField();
+
+        row2.getChildren().addAll(airportName, airportNameType);
+
+        HBox row3 = new HBox(20);
+        Label city = new Label("City");
+        TextField cityType = new TextField();
+
+        row3.getChildren().addAll(city, cityType);
+
+        HBox row4 = new HBox(20);
+        Label state = new Label("State");
+        TextField stateType = new TextField();
+
+        row4.getChildren().addAll(state, stateType);
+
+        HBox row5 = new HBox(20);
+        Label locID = new Label("location_id");
+        MenuButton locMenu = new MenuButton();
+        ArrayList<String> locList = DatabaseConnect.getLocationID();
+        for (int i = 0; i < locList.size(); i++) {
+            MenuItem locItem = new MenuItem(locList.get(i));
+            locItem.setOnAction(e -> locMenu.setText(locItem.getText()));
+            locMenu.getItems().add(locItem);
+        }
+
+        row5.getChildren().addAll(locID, locMenu);
+
+        HBox row6 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(airport()));
+
+        Button callAddAirport = new Button("Add");
+        callAddAirport.setPrefSize(200, 50);
+        callAddAirport.setOnAction(e -> {
+
+            try {
+                // airportType, airportNameType, cityType, stateType, locMenu
+                Object str_airportID = airportType.getText().equals("") ? null : airportType.getText();
+                Object str_airportName = airportNameType.getText().equals("") ? null : airportNameType.getText();
+                Object str_city = cityType.getText().equals("") ? null : cityType.getText();
+                Object str_state = stateType.getText().equals("") ? null : stateType.getText();
+                Object str_locID = locMenu.getText().equals("") ? null : locMenu.getText();
+
+
+                DatabaseConnect.usedAddAirport(str_airportID, str_airportName, str_city, str_state, str_locID);
+                alert(0, "View Airport Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct add_airport form");
+            }
+
+        });
+
+        row6.getChildren().addAll(cancel, callAddAirport);
+
+
+        addAirportPane.addRow(0, row1);
+        addAirportPane.addRow(1, row2);
+        addAirportPane.addRow(2, row3);
+        addAirportPane.addRow(3, row4);
+        addAirportPane.addRow(4, row5);
+        addAirportPane.addRow(5, row6);
+
+
+        return addAirportPane;
     }
 
     public GridPane airplane() {
@@ -141,7 +594,6 @@ public class AirlineManagement extends Application {
 
         return airplane;
     }
-
 
     public GridPane addAirplanePane () {
         GridPane addAirplanePane = new GridPane();
@@ -209,44 +661,32 @@ public class AirlineManagement extends Application {
         Button callAddAirplane = new Button("Add");
         callAddAirplane.setPrefSize(200, 50);
         callAddAirplane.setOnAction(e -> {
-            String airplaneID = aIDList.getText();
-            String plane_type = pType.getText();
-            String tail_num = tNum.getText();
-            String getSkidText = skidText.getText();
-            Object skidVal;
-            if ( getSkidText.equals("True") || getSkidText.equals("true") || getSkidText.equals("TRUE") ) {
-                skidVal = true;
-            } else if (getSkidText.equals("False") || getSkidText.equals("false") || getSkidText.equals("FALSE")) {
-                skidVal = false;
-            } else {
-                skidVal = null;
-            }
+
             try {
-                int seat_capacity = Integer.parseInt(seatCapNum.getText());
+                Object airplaneID = aIDList.getText().equals("") ? null : aIDList.getText();
+                Object plane_type = pType.getText().equals("") ? null : pType.getText();
+                Object tail_num = tNum.getText().equals("") ? null : tNum.getText();
+                Object getSkidText = skidText.getText().equals("") ? null : skidText.getText();
+                Object skidVal;
+                if ( getSkidText.equals("True") || getSkidText.equals("true") || getSkidText.equals("TRUE") ) {
+                    skidVal = true;
+                } else if (getSkidText.equals("False") || getSkidText.equals("false") || getSkidText.equals("FALSE")) {
+                    skidVal = false;
+                } else {
+                    skidVal = null;
+                }
+                Object seat_capacity = seatCapNum.getText().equals("") ? null : Integer.parseInt(seatCapNum.getText());
                 Object propVal = prop.getText().equals("") ? null : Integer.parseInt(prop.getText());
-                int speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
-                Object jet_engines = jetNum.getText().equals("") ? null : Integer.parseInt(jetNum.getText());
-                String location_id = locMenu.getText();
+                Object speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
+                Object jet_engines = jetNum.getText().equals("") ? null :Integer.parseInt(jetNum.getText());
+                String location_id = locMenu.getText().equals("") ? null : locMenu.getText();
 
 
                 DatabaseConnect.useAddAirplane(airplaneID, tail_num, seat_capacity, speedVal, location_id, plane_type,
                         skidVal, propVal, jet_engines);
-
-                Alert a = new Alert(Alert.AlertType.NONE);
-                // set alert type
-                a.setAlertType(Alert.AlertType.CONFIRMATION);
-                a.setContentText("View airplane table to check the update");
-
-                // show the dialog
-                a.show();
+                alert(0, "View Airplane Table to check the update");
             } catch (Exception exception) {
-                Alert a = new Alert(Alert.AlertType.NONE);
-                // set alert type
-                a.setAlertType(Alert.AlertType.ERROR);
-                a.setContentText("Retry with correct format");
-
-                // show the dialog
-                a.show();
+                alert(1, "Retry with correct add_airplane form");
             }
 
         });
@@ -265,6 +705,16 @@ public class AirlineManagement extends Application {
         return addAirplanePane;
     }
 
+    public void alert(int type, String message) {
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        if (type == 0) {
+            alert.setAlertType(Alert.AlertType.CONFIRMATION);
+        } else if (type == 1) {
+            alert.setAlertType(Alert.AlertType.ERROR);
+        }
+        alert.setContentText(message);
+        alert.show();
+    }
     public static void main(String[] args) {
         launch(args);
     }
