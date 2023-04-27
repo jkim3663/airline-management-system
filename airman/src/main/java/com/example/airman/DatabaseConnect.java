@@ -22,6 +22,70 @@ public class DatabaseConnect {
         return null;
     }
 
+    public static void usedOfferFlight(Object flightID, Object supportTail, Object routeID, Object progress,
+                                       Object supportAirline, Object airplaneStatus, Object nextTime) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL offer_flight(?, ?, ?, ?, ?, ?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            if (flightID == null) {
+                stmt.setNull(1, Types.NULL);
+            } else {
+                stmt.setString(1, (String) flightID);
+            }
+            if (routeID == null) {
+                stmt.setNull(2, Types.NULL);
+            } else {
+                stmt.setString(2, (String) routeID);
+            }
+            if (supportAirline == null) {
+                stmt.setNull(3, Types.NULL);
+            } else {
+                stmt.setString(3, (String) supportAirline);
+            }
+            if (supportTail == null) {
+                stmt.setNull(4, Types.NULL);
+            } else {
+                stmt.setString(4, (String) supportTail);
+            }
+            if (progress == null) {
+                stmt.setNull(5, Types.NULL);
+            } else {
+                stmt.setInt(5, (int) progress);
+            }
+            if (airplaneStatus == null) {
+                stmt.setNull(6, Types.NULL);
+            } else {
+                stmt.setString(6, (String) airplaneStatus);
+            }
+            if (nextTime == null) {
+                stmt.setNull(7, Types.NULL);
+            } else {
+                stmt.setTime(7, strToDate((String) nextTime));
+            }
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static Time strToDate(String time) {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+        try {
+            LocalTime lt = LocalTime.parse(time, dtf);
+            Time result = Time.valueOf(lt);
+            return result;
+        } catch (Exception exception) {
+            System.out.println(exception);
+            return null;
+        }
+    }
+
     public static void usedGrantPilotLicense(Object personID, Object license) {
         Connection con = connect();
         try {
@@ -29,9 +93,16 @@ public class DatabaseConnect {
             String query = "{CALL grant_pilot_license(?, ?)}";
             CallableStatement stmt = con.prepareCall(query);
 
-            stmt.setString(1, (String) personID);
-            stmt.setString(2, (String) license);
-
+            if (personID == null) {
+                stmt.setNull(1, Types.NULL);
+            } else {
+                stmt.setString(1, (String) personID);
+            }
+            if (license == null) {
+                stmt.setNull(2, Types.NULL);
+            } else {
+                stmt.setString(2, (String) license);
+            }
             stmt.execute();
             stmt.close();
 
@@ -42,7 +113,7 @@ public class DatabaseConnect {
     }
 
     public static void useAddPerson(Object personID, Object firstName, Object lastName, Object locationID, Object taxID,
-                                      Object experience, Object airlineID, Object tail_num, Object miles) {
+                                    Object experience, Object airlineID, Object tail_num, Object miles) {
         Connection con = connect();
         try {
             //here flight_management is database name, root is username and password
@@ -142,6 +213,31 @@ public class DatabaseConnect {
         }
     }
 
+    public static ArrayList<String> getSupportAirline() {
+        ArrayList<String> arr = new ArrayList<>();
+        Connection con = connect();
+
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from airline");
+            while (rs.next()) {
+                String new_airline = rs.getString("airlineID");
+                if (arr.contains(new_airline) == false) {
+                    arr.add(new_airline);
+                }
+
+            }
+
+            System.out.println("select Support Airline complete!");
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return arr;
+    }
+
     public static ArrayList<String> getLicenseType() {
         ArrayList<String> arr = new ArrayList<>();
         Connection con = connect();
@@ -178,6 +274,8 @@ public class DatabaseConnect {
                 arr.add(rs.getString("personID"));
             }
 
+            Collections.sort(arr);
+
             System.out.println("select personID complete!");
 
             con.close();
@@ -199,6 +297,8 @@ public class DatabaseConnect {
 //                System.out.println(rs.getString("locationID"));
                 arr.add(rs.getString("locationID"));
             }
+
+            Collections.sort(arr);
 
             System.out.println("select locationID complete!");
 

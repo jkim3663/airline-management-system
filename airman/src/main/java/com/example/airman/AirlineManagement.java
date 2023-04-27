@@ -1,17 +1,19 @@
-package com.example.airman;
+import com.example.airman;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
+import javax.swing.text.html.parser.Parser;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
 
 
 public class Airline extends Application {
@@ -19,7 +21,7 @@ public class Airline extends Application {
     // 1: Airplane menu scene
     // 2: Pilot menu scene
     // 3: People menu scene
-
+    // 4: Flight menu scene
     // 7: airportScene menu scene
     public static List<Scene> sceneList = new ArrayList<Scene>();
     // 0: primaryStage
@@ -112,19 +114,139 @@ public class Airline extends Application {
         GridPane airportPane = airport();
         Scene airportScene = new Scene(airportPane, 720, 480);
 
+        GridPane flightPane = flight();
+        Scene flightScene = new Scene(flightPane, 720, 480);
 
         sceneList.add(airplaneScene);       // idx 1: airplaneScene
         sceneList.add(pilotScene);          // idx 2: pilotScene
         sceneList.add(peopleScene);         // idx 3: personScene
         sceneList.add(airportScene);        // idx 5: airportScene
 
-
         Stage primaryStage = stageList.get(0);
         airplanes.setOnAction(e -> primaryStage.setScene(airplaneScene));
         airports.setOnAction(e -> primaryStage.setScene(airportScene));
         people.setOnAction(e -> primaryStage.setScene(peopleScene));
         pilots.setOnAction(e -> primaryStage.setScene(pilotScene));
+        flights.setOnAction(e -> primaryStage.setScene(flightScene));
+
         return menu;
+    }
+
+    public GridPane flight() {
+        GridPane flight = new GridPane();
+        flight.setPadding(new Insets(20, 20, 20, 20));
+        flight.setHgap(70);
+        flight.setVgap(70);
+
+        Button offer_flight = new Button("Offer Flight");
+        offer_flight.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        flight.addRow(0, offer_flight);
+        flight.addRow(1, returnBtn);
+
+        GridPane offerFlightPane = offerFlightPane();
+        Scene offerFlightScene = new Scene(offerFlightPane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        offer_flight.setOnAction(e -> primaryStage.setScene(offerFlightScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return flight;
+    }
+
+    public GridPane offerFlightPane() {
+        GridPane offerFlightPane = new GridPane();
+        offerFlightPane.setPadding(new Insets(20, 20, 20, 20));
+        offerFlightPane.setHgap(70);
+        offerFlightPane.setVgap(30);
+
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        TextField flightType = new TextField();
+
+        Label supportTail = new Label("support_tail");
+        TextField supportTailType = new TextField();
+
+        row1.getChildren().addAll(flightID, flightType, supportTail, supportTailType);
+
+        HBox row2 = new HBox(20);
+        Label routeID = new Label("routeID");
+        TextField routeIDType = new TextField();
+
+        Label progress = new Label("progress");
+        TextField progressType = new TextField();
+
+        row2.getChildren().addAll(routeID, routeIDType, progress, progressType);
+
+        HBox row3 = new HBox(20);
+        Label supportAirline = new Label("support_airline");
+        MenuButton airlineMenu = new MenuButton();
+        ArrayList<String> airlineList = DatabaseConnect.getSupportAirline();
+        for (int i = 0; i < airlineList.size(); i++) {
+            MenuItem airlineItem = new MenuItem(airlineList.get(i));
+            airlineItem.setOnAction(e -> airlineMenu.setText(airlineItem.getText()));
+            airlineMenu.getItems().add(airlineItem);
+        }
+
+        Label airplaneStatus = new Label("airplane_status");
+        MenuButton aStatusMenu = new MenuButton();
+        MenuItem inGround = new MenuItem("in_ground");
+        inGround.setOnAction(e -> aStatusMenu.setText(inGround.getText()));
+        MenuItem onGround = new MenuItem("on_ground");
+        onGround.setOnAction(e -> aStatusMenu.setText(onGround.getText()));
+        aStatusMenu.getItems().addAll(inGround, onGround);
+
+        row3.getChildren().addAll(supportAirline, airlineMenu, airplaneStatus, aStatusMenu);
+
+        HBox row4 = new HBox(20);
+        Label nextTime = new Label("next_time");
+        TextField nextTimeType = new TextField();
+
+
+        row4.getChildren().addAll(nextTime, nextTimeType);
+
+        HBox row5 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(pilot()));
+
+        Button callAddPerson = new Button("Add");
+        callAddPerson.setPrefSize(200, 50);
+        callAddPerson.setOnAction(e -> {
+
+            try {
+                Object str_flightID = flightType.getText().equals("") ? null : flightType.getText();
+                Object str_supportTail = supportTailType.getText().equals("") ? null : supportTailType.getText();
+                Object str_routeID = routeIDType.getText().equals("") ? null : routeIDType.getText();
+                Object int_progress = progressType.getText().equals("") ? null : Integer.parseInt(progressType.getText());
+                Object str_supportAirline = airlineMenu.getText().equals("") ? null : airlineMenu.getText();
+                Object str_airplaneStatus = aStatusMenu.getText().equals("") ? null : aStatusMenu.getText();
+                Object str_nextTime = nextTimeType.getText().equals("") ? null : nextTimeType.getText();
+
+                System.out.println("Status: " + (String) str_airplaneStatus);
+
+                DatabaseConnect.usedOfferFlight(str_flightID, str_supportTail, str_routeID, int_progress, str_supportAirline, str_airplaneStatus, str_nextTime);
+                alert(0, "View pilot_licenses Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct grant_pilot_license form");
+            }
+
+        });
+
+        row5.getChildren().addAll(cancel, callAddPerson);
+
+
+        offerFlightPane.addRow(0, row1);
+        offerFlightPane.addRow(1, row2);
+        offerFlightPane.addRow(2, row3);
+        offerFlightPane.addRow(3, row4);
+        offerFlightPane.addRow(4, row5);
+
+        return offerFlightPane;
     }
 
     public GridPane pilot() {
@@ -164,9 +286,9 @@ public class Airline extends Application {
         MenuButton personMenu = new MenuButton();
         ArrayList<String> personList = DatabaseConnect.getPersonID();
         for (int i = 0; i < personList.size(); i++) {
-            MenuItem locItem = new MenuItem(personList.get(i));
-            locItem.setOnAction(e -> personMenu.setText(locItem.getText()));
-            personMenu.getItems().add(locItem);
+            MenuItem personItem = new MenuItem(personList.get(i));
+            personItem.setOnAction(e -> personMenu.setText(personItem.getText()));
+            personMenu.getItems().add(personItem);
         }
 
         row1.getChildren().addAll(personID, personMenu);
@@ -177,9 +299,9 @@ public class Airline extends Application {
         MenuButton licenseMenu = new MenuButton();
         ArrayList<String> licenseList = DatabaseConnect.getLicenseType();
         for (int i = 0; i < licenseList.size(); i++) {
-            MenuItem locItem = new MenuItem(licenseList.get(i));
-            locItem.setOnAction(e -> licenseMenu.setText(locItem.getText()));
-            licenseMenu.getItems().add(locItem);
+            MenuItem licItem = new MenuItem(licenseList.get(i));
+            licItem.setOnAction(e -> licenseMenu.setText(licItem.getText()));
+            licenseMenu.getItems().add(licItem);
         }
 
         row2.getChildren().addAll(license, licenseMenu);
