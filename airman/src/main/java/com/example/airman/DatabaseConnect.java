@@ -4,6 +4,7 @@ import java.sql.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 
@@ -216,6 +217,49 @@ public class DatabaseConnect {
         }
     }
 
+    public static ArrayList<ArrayList<String>> getFlightsInTheAir() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        // arr[0][i...n] = column name
+        // arr[i][j...n] = column values
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("departing_from", "arriving_at",
+                "num_flights", "flight_list", "earliest_arrival", "latest_arrival", "airplane_list"));
+        ans.add(header);
+
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from flights_in_the_air";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String departing_from = rs.getString("departing_from");
+                String arriving_at = rs.getString("arriving_at");
+                String num_flights = Integer.toString(rs.getInt("num_flights"));
+                String flight_list = rs.getString("flight_list");
+                String earliest_arrival = rs.getTime("earliest_arrival").toString();
+                String latest_arrival = rs.getTime("latest_arrival").toString();
+                String airplane_list = rs.getString("airplane_list");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(departing_from);
+                row.add(arriving_at);
+                row.add(num_flights);
+                row.add(flight_list);
+                row.add(earliest_arrival);
+                row.add(latest_arrival);
+                row.add(airplane_list);
+
+                ans.add(row);
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
+    }
+
     public static ArrayList<String> getSupportAirline() {
         ArrayList<String> arr = new ArrayList<>();
         Connection con = connect();
@@ -334,5 +378,6 @@ public class DatabaseConnect {
 
     public static void main(String[] args) {
         getLocationID();
+        getFlightsInTheAir();
     }
 }

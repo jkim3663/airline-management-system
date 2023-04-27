@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 
@@ -17,6 +18,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import com.example.airman.DatabaseConnect;
 
@@ -120,6 +122,9 @@ public class AirlineManagement extends Application {
         GridPane flightPane = flight();
         Scene flightScene = new Scene(flightPane, 720, 480);
 
+        GridPane viewSimPane = viewSimPane();
+        Scene viewSimScene = new Scene(viewSimPane, 720, 480);
+
         sceneList.add(airplaneScene);       // idx 1: airplaneScene
         sceneList.add(pilotScene);          // idx 2: pilotScene
         sceneList.add(peopleScene);         // idx 3: personScene
@@ -131,8 +136,62 @@ public class AirlineManagement extends Application {
         people.setOnAction(e -> primaryStage.setScene(peopleScene));
         pilots.setOnAction(e -> primaryStage.setScene(pilotScene));
         flights.setOnAction(e -> primaryStage.setScene(flightScene));
+        viewsAndSimulation.setOnAction(e -> primaryStage.setScene(viewSimScene));
 
         return menu;
+    }
+
+    /**
+     * This is going to contain all buttons to views
+     */
+    public GridPane viewSimPane() {
+        GridPane viewSimPane = new GridPane();
+        viewSimPane.setPadding(new Insets(20, 20, 20, 20));
+        viewSimPane.setHgap(70);
+        viewSimPane.setVgap(70);
+
+        Button flightsInAir = new Button("View flights_in_air");
+        flightsInAir.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        viewSimPane.addRow(0, flightsInAir);
+        viewSimPane.addRow(1, returnBtn);
+
+        GridPane flightsInTheAir = flightsInTheAir();
+        Scene query19 = new Scene(flightsInTheAir, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        flightsInAir.setOnAction(e -> primaryStage.setScene(query19));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+
+        return viewSimPane;
+    }
+
+    public GridPane flightsInTheAir() {
+        GridPane flightsInTheAir = new GridPane();
+        flightsInTheAir.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getFlightsInTheAir();
+        for (int i = 0; i < tableValues.size(); i ++) {
+            HBox row = new HBox(20);
+            row.setAlignment(Pos.CENTER);
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                row.getChildren().add(new Label(tableValues.get(i).get(j)));
+            }
+            flightsInTheAir.addRow(i, row);
+        }
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        flightsInTheAir.addRow(flightsInTheAir.getRowCount(), returnBtn);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return flightsInTheAir;
     }
 
     public GridPane flight() {
