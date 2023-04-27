@@ -179,7 +179,9 @@ public class AirlineManagement extends Application {
             HBox row = new HBox(20);
             row.setAlignment(Pos.CENTER);
             for (int j = 0; j < tableValues.get(0).size(); j++) {
-                row.getChildren().add(new Label(tableValues.get(i).get(j)));
+                Label lb = new Label(tableValues.get(i).get(j));
+                lb.setMinWidth(70);
+                row.getChildren().add(lb);
             }
             flightsInTheAir.addRow(i, row);
         }
