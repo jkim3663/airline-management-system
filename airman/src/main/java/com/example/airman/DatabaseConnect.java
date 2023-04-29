@@ -1,4 +1,4 @@
-import comp.example.airman
+import com.example.airman
 
 import java.sql.*;
 import java.time.LocalTime;
@@ -12,7 +12,7 @@ public class DatabaseConnect {
 
     private static String url = "jdbc:mysql://localhost:3306/flight_management";
     private static String username = "root";
-    private static String password = "1234";
+    private static String password = "paul0225";
 
     public static Connection connect() {
         try {
@@ -451,6 +451,140 @@ public class DatabaseConnect {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+
+    public static void getSimulCycle() {
+        Connection con = connect();
+        try {
+            String query = "{CALL simulation_cycle()}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static ArrayList<ArrayList<String>> getAltAirports() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("City", "State", "Airports Count", "Airport Code List", "Airport Name List"));
+        ans.add(header);
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from alternative_airports";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String city = rs.getString("city");
+                String state = rs.getString("state");
+                String num_airports = Integer.toString(rs.getInt("num_airports"));
+                String airport_code_list = rs.getString("airport_code_list");
+                String airport_name_list = rs.getString("airport_name_list");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(city);
+                row.add(state);
+                row.add(num_airports);
+                row.add(airport_code_list);
+                row.add(airport_name_list);
+
+                ans.add(row);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
+    }
+
+    public static ArrayList<ArrayList<String>> getRouteSummary() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("Route", "Leg Count", "Leg Sequence", "Route Length",
+                "Flights Count", "Flight List", "Airport Sequence"));
+        ans.add(header);
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from route_summary";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String route = rs.getString("route");
+                String num_legs = Integer.toString(rs.getInt("num_legs"));
+                String leg_sequence = rs.getString("leg_sequence");
+                String route_length = Integer.toString(rs.getInt("route_length"));
+                String num_flights = Integer.toString(rs.getInt("num_flights"));
+                String flight_list = rs.getString("flight_list");
+                String airport_sequence = rs.getString("airport_sequence");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(route);
+                row.add(num_legs);
+                row.add(leg_sequence);
+                row.add(route_length);
+                row.add(num_flights);
+                row.add(flight_list);
+                row.add(airport_sequence);
+
+                ans.add(row);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
+    }
+
+    public static ArrayList<ArrayList<String>> getPeopleInTheGround() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("Departure", "Airport", "Airport Name", "City",
+                "State", "Pilot Count", "Passenger Count", "Joint Pilot-Passenger", "Person List"));
+        ans.add(header);
+
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from people_on_the_ground";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String departing_from = rs.getString("departing_from");
+                String airport_ID = rs.getString("airport");
+                String airport_name = rs.getString("airport_name");
+                String city = rs.getString("city");
+                String state = rs.getString("state");
+                String num_pilots = Integer.toString(rs.getInt("num_pilots"));
+                String num_passengers = Integer.toString(rs.getInt("num_passengers"));
+                String joint_pilots_passengers = Integer.toString(rs.getInt("joint_pilots_passengers"));
+                String person_list = rs.getString("person_list");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(departing_from);
+                row.add(airport_ID);
+                row.add(airport_name);
+                row.add(city);
+                row.add(state);
+                row.add(num_pilots);
+                row.add(num_passengers);
+                row.add(joint_pilots_passengers);
+                row.add(person_list);
+
+                ans.add(row);
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
     }
 
     public static ArrayList<ArrayList<String>> getPeopleInTheAir() {
