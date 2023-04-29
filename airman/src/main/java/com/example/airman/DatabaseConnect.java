@@ -1,12 +1,15 @@
-import com.example.airman;
+import comp.example.airman
 
 import java.sql.*;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 public class DatabaseConnect {
 
-    // (url, username, password)
     private static String url = "jdbc:mysql://localhost:3306/flight_management";
     private static String username = "root";
     private static String password = "1234";
@@ -213,6 +216,374 @@ public class DatabaseConnect {
         }
     }
 
+    public static void usePurchaseTicket(Object ticketID, Object cost, Object carrier, Object customer, Object deplane,
+                                         Object seatNum) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL purchase_ticket_and_seat(?, ?, ?, ?, ?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) ticketID);
+            stmt.setInt(2, (int) cost);
+            stmt.setString(3, (String) carrier);
+            stmt.setString(4, (String) customer);
+            stmt.setString(5, (String) deplane);
+            stmt.setString(6, (String) seatNum);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void useAddUpdateLeg(Object legID, Object distance, Object departure, Object arrival) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL add_update_leg(?, ?, ?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) legID);
+            stmt.setInt(2, (int) distance);
+            stmt.setString(3, (String) departure);
+            stmt.setString(4, (String) arrival);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useStartRoute(Object routeID, Object legID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL start_route(?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) routeID);
+            stmt.setString(2, (String) legID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void useExtendRoute(Object routeID, Object legID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL extend_route(?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) routeID);
+            stmt.setString(2, (String) legID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static void useFlightLand(Object flightID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL flight_landing(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useFlightOff(Object flightID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL flight_takeoff(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void usePassBoard(Object flightID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL passengers_board(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void usePassDisembark(Object flightID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL passengers_disembark(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useAssignPilot(Object flightID, Object personID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL assign_pilot(?, ?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+            stmt.setString(2, (String) personID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useRecycleCrew(Object flightID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL recycle_crew(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useRemovePilotRole(Object personID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL remove_pilot_role(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) personID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useRetireFlight(Object flightID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL retire_flight(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) flightID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    public static void useRemovePassengerRole(Object perosnID) {
+        Connection con = connect();
+        try {
+            //here flight_management is database name, root is username and password
+            String query = "{CALL remove_passenger_role(?)}";
+            CallableStatement stmt = con.prepareCall(query);
+
+            stmt.setString(1, (String) perosnID);
+
+            stmt.execute();
+            stmt.close();
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    public static ArrayList<ArrayList<String>> getPeopleInTheAir() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("Departure", "Arrival", "Airplane Count", "Airplane List",
+                "Flight List", "Earliest Arrival", "Latest Arrival", "Pilot Count", "Person Count", "Person List"));
+        ans.add(header);
+
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from people_in_the_air";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String departing_from = rs.getString("departing_from");
+                String arriving_at = rs.getString("arriving_at");
+                String num_airplanes = Integer.toString(rs.getInt("num_airplanes"));
+                String airplane_list = rs.getString("airplane_list");
+                String flight_list = rs.getString("flight_list");
+                String earliest_arrival = rs.getTime("earliest_arrival").toString();
+                String latest_arrival = rs.getTime("latest_arrival").toString();
+                String num_pilots = Integer.toString(rs.getInt("num_pilots"));
+                String num_passengers = Integer.toString(rs.getInt("num_passengers"));
+                String joint_pilots_passengers = Integer.toString(rs.getInt("joint_pilots_passengers"));
+                String person_list = rs.getString("person_list");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(departing_from);
+                row.add(arriving_at);
+                row.add(num_airplanes);
+                row.add(airplane_list);
+                row.add(flight_list);
+                row.add(earliest_arrival);
+                row.add(latest_arrival);
+                row.add(num_pilots);
+                row.add(num_passengers);
+                row.add(joint_pilots_passengers);
+                row.add(person_list);
+
+                ans.add(row);
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
+    }
+
+    public static ArrayList<ArrayList<String>> getFlightsOnTheGround() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("Departing From", "Number Flights",
+                "Flight List", "Earliest Arrival", "Latest Arrival", "Airplane List"));
+        ans.add(header);
+
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from flights_on_the_ground";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String departing_from = rs.getString("departing_from");
+                String num_flights = Integer.toString(rs.getInt("num_flights"));
+                String flight_list = rs.getString("flight_list");
+                String earliest_arrival = rs.getTime("earliest_arrival").toString();
+                String latest_arrival = rs.getTime("latest_arrival").toString();
+                String airplane_list = rs.getString("airplane_list");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(departing_from);
+                row.add(num_flights);
+                row.add(flight_list);
+                row.add(earliest_arrival);
+                row.add(latest_arrival);
+                row.add(airplane_list);
+
+                ans.add(row);
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
+    }
+
+    public static ArrayList<ArrayList<String>> getFlightsInTheAir() {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        // arr[0][i...n] = column name
+        // arr[i][j...n] = column values
+        Connection con = connect();
+
+        ArrayList<String> header = new ArrayList<>(Arrays.asList("Departure Airport", "Arrival Airport",
+                "Number Flights", "Flight List", "Earliest Arrival", "Latest_arrival", "Airplane List"));
+        ans.add(header);
+
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from flights_in_the_air";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                String departing_from = rs.getString("departing_from");
+                String arriving_at = rs.getString("arriving_at");
+                String num_flights = Integer.toString(rs.getInt("num_flights"));
+                String flight_list = rs.getString("flight_list");
+                String earliest_arrival = rs.getTime("earliest_arrival").toString();
+                String latest_arrival = rs.getTime("latest_arrival").toString();
+                String airplane_list = rs.getString("airplane_list");
+
+                ArrayList<String> row = new ArrayList<>();
+                row.add(departing_from);
+                row.add(arriving_at);
+                row.add(num_flights);
+                row.add(flight_list);
+                row.add(earliest_arrival);
+                row.add(latest_arrival);
+                row.add(airplane_list);
+
+                ans.add(row);
+
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return ans;
+    }
+
     public static ArrayList<String> getSupportAirline() {
         ArrayList<String> arr = new ArrayList<>();
         Connection con = connect();
@@ -308,6 +679,73 @@ public class DatabaseConnect {
         }
 
         // System.out.println(arr.get(0));
+
+        return arr;
+    }
+    public static ArrayList<String> getAirportID() {
+        ArrayList<String> arr = new ArrayList<>();
+        Connection con = connect();
+
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from airport");
+            while (rs.next()) {
+                arr.add(rs.getString("airportID"));
+            }
+
+            Collections.sort(arr);
+
+            System.out.println("select airportID complete!");
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return arr;
+    }
+
+    public static ArrayList<String> getLegID() {
+        ArrayList<String> arr = new ArrayList<>();
+        Connection con = connect();
+
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from leg");
+            while (rs.next()) {
+                arr.add(rs.getString("legID"));
+            }
+
+            Collections.sort(arr);
+
+            System.out.println("select legID complete!");
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        return arr;
+    }
+    public static ArrayList<String> getFlightID() {
+        ArrayList<String> arr = new ArrayList<>();
+        Connection con = connect();
+
+        try {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from flight");
+            while (rs.next()) {
+                arr.add(rs.getString("flightID"));
+            }
+
+            Collections.sort(arr);
+
+            System.out.println("select flightID complete!");
+
+            con.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
         return arr;
     }
