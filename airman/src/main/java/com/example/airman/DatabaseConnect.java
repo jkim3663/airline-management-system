@@ -470,6 +470,45 @@ public class DatabaseConnect {
         }
     }
 
+    public static ArrayList<ArrayList<String>> getTable(String tbName) {
+        ArrayList<ArrayList<String>> ans = new ArrayList<>();
+        Connection con = connect();
+        ArrayList<String> header = new ArrayList<>();
+
+        try {
+            Statement stmt = con.createStatement();
+            String query = "select * from " + tbName;
+            ResultSet rs = stmt.executeQuery(query);
+            ResultSetMetaData rsMetaData = rs.getMetaData();
+            int count = rsMetaData.getColumnCount();
+
+            for (int i = 1; i <= count; i++) {
+                header.add(rsMetaData.getColumnName(i));
+            }
+
+            ans.add(header);
+
+            while (rs.next()) {
+                ArrayList<String> row = new ArrayList<>();
+                for (int i = 0; i < header.size(); i++) {
+                    String colVal = rs.getString(header.get(i));
+                    row.add(colVal);
+                }
+                ans.add(row);
+            }
+
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+        for (int i = 0; i < ans.size(); i++) {
+            for (int j = 0; j < ans.get(i).size(); j++) {
+                System.out.println(ans.get(i).get(j));
+            }
+        }
+        return ans;
+    }
+
     public static ArrayList<ArrayList<String>> getAltAirports() {
         ArrayList<ArrayList<String>> ans = new ArrayList<>();
         Connection con = connect();
@@ -904,5 +943,6 @@ public class DatabaseConnect {
 
     public static void main(String[] args) {
         getLocationID();
+        getTable("airplane");
     }
 }

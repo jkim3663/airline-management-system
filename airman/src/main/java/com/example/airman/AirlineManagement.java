@@ -170,6 +170,24 @@ public class AirlineManagement extends Application {
     public GridPane viewTablePane() {
         GridPane viewTablePane = getGridPane();
 
+        Button airline = new Button("Airline Table");
+        airline.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        viewTablePane.addRow(0, airline);
+
+        viewTablePane.setAlignment(Pos.CENTER);
+
+        Stage primaryStage = stageList.get(0);
+
+        ScrollPane airlinePane = airlineTable();
+        Scene airlineScene = new Scene(airlinePane, 720, 480);
+
+        airline.setOnAction(e -> primaryStage.setScene(airlineScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
         return viewTablePane;
     }
 
@@ -341,6 +359,36 @@ public class AirlineManagement extends Application {
         routeSummary.addRow(routeSummary.getRowCount(), returnBtn);
 
         ScrollPane scrollPane = makeScrollPane(routeSummary);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return scrollPane;
+    }
+
+    public ScrollPane airlineTable() {
+        GridPane airlinePane = new GridPane();
+        airlinePane.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String >> tableValues = DatabaseConnect.getTable("airline");
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                airlinePane.getChildren().add(box);
+            }
+        }
+
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airlinePane.addRow(airlinePane.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(airlinePane);
 
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
 
