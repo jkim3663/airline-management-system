@@ -109,6 +109,11 @@ public class AirlineManagement extends Application {
 
         menu.addRow(3, flights, viewsAndSimulation);
 
+        Button viewTable = new Button("View all tables");
+        viewTable.setPrefSize(200, 50);
+
+        menu.addRow(4, viewTable);
+
         menu.setAlignment(Pos.CENTER);
 
         GridPane airplanePane = airplane();
@@ -135,6 +140,10 @@ public class AirlineManagement extends Application {
         GridPane viewSimPane = viewSimPane();
         Scene viewSimScene = new Scene(viewSimPane, 720, 480);
 
+        GridPane viewTablePane = viewTablePane();
+        Scene viewTableScene = new Scene(viewTablePane, 720, 480);
+
+
         sceneList.add(airplaneScene);       // idx 1: airplaneScene
         sceneList.add(pilotScene);          // idx 2: pilotScene
         sceneList.add(peopleScene);         // idx 3: personScene
@@ -142,6 +151,7 @@ public class AirlineManagement extends Application {
         sceneList.add(airportScene);        // idx 5: airportScene
         sceneList.add(ticketScene);         // idx 6: ticketScene
         sceneList.add(routeScene);         // idx 7: ticketScene
+
 
         Stage primaryStage = stageList.get(0);
         airplanes.setOnAction(e -> primaryStage.setScene(airplaneScene));
@@ -152,8 +162,15 @@ public class AirlineManagement extends Application {
         tickets.setOnAction(e -> primaryStage.setScene(ticketScene));
         routes.setOnAction(e -> primaryStage.setScene(routeScene));
         viewsAndSimulation.setOnAction(e -> primaryStage.setScene(viewSimScene));
+        viewTable.setOnAction(e -> primaryStage.setScene(viewTableScene));
 
         return menu;
+    }
+
+    public GridPane viewTablePane() {
+        GridPane viewTablePane = getGridPane();
+
+        return viewTablePane;
     }
 
     /**
