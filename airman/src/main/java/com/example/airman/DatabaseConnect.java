@@ -1,5 +1,14 @@
 package com.example.airman;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+
 import java.sql.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -17,8 +26,7 @@ public class DatabaseConnect {
     public static Connection connect() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection(
-                    "jdbc:mysql://localhost:3306/flight_management", "root", "josh0205");
+            Connection con = DriverManager.getConnection(url, username, password);
             return con;
         } catch (Exception e) {
             System.out.println(e);
@@ -632,7 +640,7 @@ public class DatabaseConnect {
         Connection con = connect();
 
         ArrayList<String> header = new ArrayList<>(Arrays.asList("Departure", "Arrival", "Airplane Count", "Airplane List",
-                "Flight List", "Earliest Arrival", "Latest Arrival", "Pilot Count", "Person Count", "Person List"));
+                "Flight List", "Earliest Arrival", "Latest Arrival", "Pilot Count", "Passenger Count", "Person Count", "Person List"));
         ans.add(header);
 
 
@@ -864,7 +872,9 @@ public class DatabaseConnect {
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("select * from airport");
             while (rs.next()) {
-                arr.add(rs.getString("airportID"));
+                if (!arr.contains(rs.getString("airportID"))) {
+                    arr.add(rs.getString("airportID"));
+                }
             }
 
             Collections.sort(arr);
