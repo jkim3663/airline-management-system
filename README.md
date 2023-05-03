@@ -20,7 +20,7 @@ Our team has used Java, JavaFX, MySQL to create a desktop application that provi
 * 2 SQL files are for the database and procedure/view setup.
 
 ## Work distribution
-* Inhyeong Park: Procedures 2~5 + 25, view 20~24 
+* Inhyeong Park: Procedures 2 to 5 + 25, view 20 to 24 
 * Jun Yeop Kim: Initial setup for database connection and UI, procedure 1, view 19, flight managment tables 1~14
 * Yunsu Kim: Procedures 6~18
 
