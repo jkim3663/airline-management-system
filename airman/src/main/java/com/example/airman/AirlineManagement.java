@@ -3,10 +3,13 @@ package com.example.airman;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Side;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -18,7 +21,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.GZIPInputStream;
 
 import com.example.airman.DatabaseConnect;
 
@@ -26,6 +28,10 @@ import com.example.airman.DatabaseConnect;
 public class AirlineManagement extends Application {
     // 0: main menu scene
     // 1: Airplane menu scene
+    // 2: Pilot menu scene
+    // 3: People menu scene
+    // 4: Flight menu scene
+    // 7: airportScene menu scene ...
     public static List<Scene> sceneList = new ArrayList<Scene>();
     // 0: primaryStage
     public static List<Stage> stageList = new ArrayList<Stage>();
@@ -73,9 +79,7 @@ public class AirlineManagement extends Application {
 
 
     public GridPane menuScene() {
-        GridPane menu = new GridPane();
-        menu.setHgap(70);
-        menu.setVgap(70);
+        GridPane menu = getGridPane();
 
         Button airplanes = new Button("Airplanes");
         Button routes = new Button("Routes");
@@ -122,13 +126,22 @@ public class AirlineManagement extends Application {
         GridPane flightPane = flight();
         Scene flightScene = new Scene(flightPane, 720, 480);
 
+        GridPane ticketPane = ticket();
+        Scene ticketScene = new Scene(ticketPane, 720, 480);
+
+        GridPane routePane = route();
+        Scene routeScene = new Scene(routePane, 720, 480);
+
         GridPane viewSimPane = viewSimPane();
         Scene viewSimScene = new Scene(viewSimPane, 720, 480);
 
         sceneList.add(airplaneScene);       // idx 1: airplaneScene
         sceneList.add(pilotScene);          // idx 2: pilotScene
         sceneList.add(peopleScene);         // idx 3: personScene
+        sceneList.add(flightScene);         // idx 4: flightScene
         sceneList.add(airportScene);        // idx 5: airportScene
+        sceneList.add(ticketScene);         // idx 6: ticketScene
+        sceneList.add(routeScene);         // idx 7: ticketScene
 
         Stage primaryStage = stageList.get(0);
         airplanes.setOnAction(e -> primaryStage.setScene(airplaneScene));
@@ -136,6 +149,8 @@ public class AirlineManagement extends Application {
         people.setOnAction(e -> primaryStage.setScene(peopleScene));
         pilots.setOnAction(e -> primaryStage.setScene(pilotScene));
         flights.setOnAction(e -> primaryStage.setScene(flightScene));
+        tickets.setOnAction(e -> primaryStage.setScene(ticketScene));
+        routes.setOnAction(e -> primaryStage.setScene(routeScene));
         viewsAndSimulation.setOnAction(e -> primaryStage.setScene(viewSimScene));
 
         return menu;
@@ -145,32 +160,265 @@ public class AirlineManagement extends Application {
      * This is going to contain all buttons to views
      */
     public GridPane viewSimPane() {
-        GridPane viewSimPane = new GridPane();
-        viewSimPane.setPadding(new Insets(20, 20, 20, 20));
-        viewSimPane.setHgap(70);
-        viewSimPane.setVgap(70);
+        GridPane viewSimPane = getGridPane();
 
-        Button flightsInAir = new Button("View flights_in_air");
+        Button flightsInAir = new Button("View flights-in-air");
         flightsInAir.setPrefSize(200, 50);
+
+        Button flightsOnGround = new Button("View flights-on-ground");
+        flightsOnGround.setPrefSize(200, 50);
+
+        viewSimPane.addRow(0, flightsInAir, flightsOnGround);
+
+        Button peopleInAir = new Button("View people-in-air");
+        peopleInAir.setPrefSize(200, 50);
+
+        Button peopleInGround = new Button("View people-in-ground");
+        peopleInGround.setPrefSize(200, 50);
+
+        viewSimPane.addRow(1, peopleInAir, peopleInGround);
+
+        Button routeSummary = new Button("View Route-Summary");
+        routeSummary.setPrefSize(200, 50);
+
+        Button altAirport = new Button("View Alternative-Airports");
+        altAirport.setPrefSize(200, 50);
+
+        viewSimPane.addRow(2, routeSummary, altAirport);
+
+        Button simulation_cycle = new Button("View Simulation-Cycle");
+        simulation_cycle.setPrefSize(200, 50);
+
+        viewSimPane.addRow(3, simulation_cycle);
 
         Button returnBtn = new Button("Return to previous");
         returnBtn.setPrefSize(200, 50);
 
-        viewSimPane.addRow(0, flightsInAir);
-        viewSimPane.addRow(1, returnBtn);
+        viewSimPane.addRow(4, returnBtn);
 
-        GridPane flightsInTheAir = flightsInTheAir();
+        viewSimPane.setAlignment(Pos.CENTER);
+
+        ScrollPane flightsInTheAir = flightsInTheAir();
         Scene query19 = new Scene(flightsInTheAir, 720, 480);
+
+        ScrollPane flightsOnTheGround = flightsOnGround();
+        Scene query20 = new Scene(flightsOnTheGround, 720, 480);
+
+        ScrollPane peopleInTheAir = peopleInAir();
+        Scene query21 = new Scene(peopleInTheAir, 720, 480);
+
+        ScrollPane peopleInTheGround = peopleInGround();
+        Scene query22 = new Scene(peopleInTheGround, 720, 480);
+
+        ScrollPane route_Summary = routeSummary();
+        Scene query23 = new Scene(route_Summary, 720, 480);
+
+        ScrollPane alternativeAirport = alternativeAirport();
+        Scene query24 = new Scene(alternativeAirport, 720, 480);
+
+        GridPane simulCycle = simulationCycle();
+        Scene query25 = new Scene(simulCycle, 720, 480);
 
         Stage primaryStage = stageList.get(0);
         flightsInAir.setOnAction(e -> primaryStage.setScene(query19));
+        flightsOnGround.setOnAction(e -> primaryStage.setScene(query20));
+        peopleInAir.setOnAction(e -> primaryStage.setScene(query21));
+        peopleInGround.setOnAction(e -> primaryStage.setScene(query22));
+        routeSummary.setOnAction(e -> primaryStage.setScene(query23));
+        altAirport.setOnAction(e -> primaryStage.setScene(query24));
+        simulation_cycle.setOnAction(e -> primaryStage.setScene(query25));
+
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
 
 
         return viewSimPane;
     }
 
-    public GridPane flightsInTheAir() {
+    public GridPane simulationCycle() {
+        GridPane simulCycle = getGridPane();
+
+        HBox row = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(viewSimPane()));
+
+        Button runCycle = new Button("Run");
+        runCycle.setPrefSize(200, 50);
+        runCycle.setOnAction(e -> {
+
+            try {
+                DatabaseConnect.getSimulCycle();
+                alert(0, "View flight Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with simulation_cycle");
+            }
+
+        });
+
+        row.getChildren().addAll(cancel, runCycle);
+
+        simulCycle.addRow(0, row);
+
+        return simulCycle;
+    }
+
+
+    public ScrollPane alternativeAirport() {
+        GridPane altAirports = new GridPane();
+        altAirports.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getAltAirports();
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane onebox = new StackPane();
+                onebox.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                onebox.getChildren().add(lb);
+                GridPane.setConstraints(onebox, j, i);
+                altAirports.getChildren().add(onebox);
+            }
+        }
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        altAirports.addRow(altAirports.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(altAirports);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return scrollPane;
+    }
+
+    public ScrollPane makeScrollPane(GridPane gridPane) {
+        ScrollPane scrollPane = new ScrollPane(gridPane);
+        scrollPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setPrefSize(600, 400);
+
+        return  scrollPane;
+    }
+
+    public ScrollPane routeSummary() {
+        GridPane routeSummary = new GridPane();
+        routeSummary.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getRouteSummary();
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                routeSummary.getChildren().add(box);
+            }
+        }
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        routeSummary.addRow(routeSummary.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(routeSummary);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return scrollPane;
+    }
+
+
+    public ScrollPane peopleInGround() {
+        GridPane peopleInGround = new GridPane();
+        peopleInGround.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getPeopleInTheGround();
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                peopleInGround.getChildren().add(box);
+            }
+        }
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        peopleInGround.addRow(peopleInGround.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(peopleInGround);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return scrollPane;
+    }
+
+    public ScrollPane peopleInAir() {
+        GridPane peopleInAir = new GridPane();
+        peopleInAir.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getPeopleInTheGround();
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                peopleInAir.getChildren().add(box);
+            }
+        }
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        peopleInAir.addRow(peopleInAir.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(peopleInAir);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return scrollPane;
+    }
+
+    public ScrollPane flightsOnGround() {
+        GridPane flightsOnGround = new GridPane();
+        flightsOnGround.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getFlightsOnTheGround();
+        for (int i = 0; i < tableValues.size(); i ++) {
+            HBox row = new HBox(20);
+            row.setAlignment(Pos.CENTER);
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                Label lb = new Label(tableValues.get(i).get(j));
+                lb.setMinWidth(70);
+                row.getChildren().add(lb);
+            }
+            row.setStyle("-fx-border-width: 1;" + "-fx-border-radius: 1;" + "-fx-border-color: black;");
+            flightsOnGround.addRow(i, row);
+        }
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        flightsOnGround.addRow(flightsOnGround.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(flightsOnGround);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+
+        return scrollPane;
+    }
+
+    public ScrollPane flightsInTheAir() {
         GridPane flightsInTheAir = new GridPane();
         flightsInTheAir.setPadding(new Insets(50, 50, 50, 50));
 
@@ -183,6 +431,7 @@ public class AirlineManagement extends Application {
                 lb.setMinWidth(70);
                 row.getChildren().add(lb);
             }
+            row.setStyle("-fx-border-width: 1;" + "-fx-border-radius: 1;" + "-fx-border-color: black;");
             flightsInTheAir.addRow(i, row);
         }
 
@@ -191,42 +440,56 @@ public class AirlineManagement extends Application {
 
         flightsInTheAir.addRow(flightsInTheAir.getRowCount(), returnBtn);
 
+        ScrollPane scrollPane = makeScrollPane(flightsInTheAir);
+
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
 
-        return flightsInTheAir;
+        return scrollPane;
     }
 
     public GridPane flight() {
-        GridPane flight = new GridPane();
-        flight.setPadding(new Insets(20, 20, 20, 20));
-        flight.setHgap(70);
-        flight.setVgap(70);
+        GridPane flight = getGridPane();
 
         Button offer_flight = new Button("Offer Flight");
         offer_flight.setPrefSize(200, 50);
 
+        Button flightLanding = new Button("Flight Landing");
+        flightLanding.setPrefSize(200, 50);
+
+        Button flightOff = new Button("Flight Takeoff");
+        flightOff.setPrefSize(200, 50);
+
+        Button retireFlight = new Button("Retire Flight");
+        retireFlight.setPrefSize(200, 50);
+
         Button returnBtn = new Button("Return to previous");
         returnBtn.setPrefSize(200, 50);
 
-        flight.addRow(0, offer_flight);
-        flight.addRow(1, returnBtn);
+        flight.addRow(0, offer_flight, retireFlight);
+        flight.addRow(1, flightLanding, flightOff);
+        flight.addRow(2, returnBtn);
 
         GridPane offerFlightPane = offerFlightPane();
         Scene offerFlightScene = new Scene(offerFlightPane, 720, 480);
+        GridPane fLandPane = fLandPane();
+        Scene fLandScene = new Scene(fLandPane, 720, 480);
+        GridPane fOffPane = fOffPane();
+        Scene fOffScene = new Scene(fOffPane, 720, 480);
+        GridPane retireFlightPane = retireFlightPane();
+        Scene retireFlightScene = new Scene(retireFlightPane, 720, 480);
 
         Stage primaryStage = stageList.get(0);
         offer_flight.setOnAction(e -> primaryStage.setScene(offerFlightScene));
+        flightLanding.setOnAction(e -> primaryStage.setScene(fLandScene));
+        flightOff.setOnAction(e -> primaryStage.setScene(fOffScene));
+        retireFlight.setOnAction(e -> primaryStage.setScene(retireFlightScene));
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
 
         return flight;
     }
 
     public GridPane offerFlightPane() {
-        GridPane offerFlightPane = new GridPane();
-        offerFlightPane.setPadding(new Insets(20, 20, 20, 20));
-        offerFlightPane.setHgap(70);
-        offerFlightPane.setVgap(30);
-
+        GridPane offerFlightPane = getGridPane();
 
         HBox row1 = new HBox(20);
         Label flightID = new Label("flightID");
@@ -313,37 +576,158 @@ public class AirlineManagement extends Application {
         return offerFlightPane;
     }
 
+    public GridPane fLandPane() {
+        GridPane fLandPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        TextField putFlightID = new TextField();
+
+        row1.getChildren().addAll(flightID, putFlightID);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(flight()));
+
+        Button callFLand = new Button("Update");
+        callFLand.setPrefSize(200, 50);
+        callFLand.setOnAction(e -> {
+
+            try {
+                Object str_flightID = putFlightID.getText().equals("") ? null : putFlightID.getText();
+
+                DatabaseConnect.useFlightLand(str_flightID);
+                alert(0, "View flight, pilot, and passenger Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct flight_land() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callFLand);
+
+        fLandPane.addRow(0, row1);
+        fLandPane.addRow(1, row2);
+
+        return fLandPane;
+    }
+    public GridPane fOffPane() {
+        GridPane fOffPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        TextField putFlightID = new TextField();
+
+        row1.getChildren().addAll(flightID, putFlightID);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(flight()));
+
+        Button callFOff = new Button("Update");
+        callFOff.setPrefSize(200, 50);
+        callFOff.setOnAction(e -> {
+
+            try {
+                Object str_flightID = putFlightID.getText().equals("") ? null : putFlightID.getText();
+
+                DatabaseConnect.useFlightOff(str_flightID);
+                alert(0, "View flight Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct flight_off() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callFOff);
+
+        fOffPane.addRow(0, row1);
+        fOffPane.addRow(1, row2);
+
+        return fOffPane;
+    }
+
+    public GridPane retireFlightPane() {
+        GridPane retireFlightPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        TextField putFlightID = new TextField();
+
+        row1.getChildren().addAll(flightID, putFlightID);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(flight()));
+
+        Button callRetireF = new Button("Update");
+        callRetireF.setPrefSize(200, 50);
+        callRetireF.setOnAction(e -> {
+
+            try {
+                Object str_flightID = putFlightID.getText().equals("") ? null : putFlightID.getText();
+
+                DatabaseConnect.useRetireFlight(str_flightID);
+                alert(0, "View flight Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct retire_flight() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callRetireF);
+
+        retireFlightPane.addRow(0, row1);
+        retireFlightPane.addRow(1, row2);
+
+        return retireFlightPane;
+    }
+
+
     public GridPane pilot() {
-        GridPane pilot = new GridPane();
-        pilot.setPadding(new Insets(20, 20, 20, 20));
-        pilot.setHgap(70);
-        pilot.setVgap(70);
+        GridPane pilot = getGridPane();
 
         Button grant_pilot = new Button("Grant Pilot License");
         grant_pilot.setPrefSize(200, 50);
 
+        Button assign_pilot = new Button("Assign Pilot");
+        assign_pilot.setPrefSize(200, 50);
+        Button recycle_crew = new Button("Recycle Crew");
+        recycle_crew.setPrefSize(200, 50);
+        Button remove_pilot = new Button("Remove Pilot Role");
+        remove_pilot.setPrefSize(200, 50);
+
         Button returnBtn = new Button("Return to previous");
         returnBtn.setPrefSize(200, 50);
 
-        pilot.addRow(0, grant_pilot);
-        pilot.addRow(1, returnBtn);
+        pilot.addRow(0, grant_pilot, assign_pilot);
+        pilot.addRow(1, recycle_crew, remove_pilot);
+        pilot.addRow(2, returnBtn);
 
         GridPane grantPilotPane = grantPilotPane();
         Scene grantPilotScene = new Scene(grantPilotPane, 720, 480);
+        GridPane assignPilotPane = assignPilotPane();
+        Scene assignPilotScene = new Scene(assignPilotPane, 720, 480);
+        GridPane recycleCrewPane = recycleCrewPane();
+        Scene recycleCrewScene = new Scene(recycleCrewPane, 720, 480);
+        GridPane removePilotPane = removePilotPane();
+        Scene removePilotScene = new Scene(removePilotPane, 720, 480);
 
         Stage primaryStage = stageList.get(0);
         grant_pilot.setOnAction(e -> primaryStage.setScene(grantPilotScene));
+        assign_pilot.setOnAction(e -> primaryStage.setScene(assignPilotScene ));
+        recycle_crew.setOnAction(e -> primaryStage.setScene(recycleCrewScene ));
+        remove_pilot.setOnAction(e -> primaryStage.setScene(removePilotScene ));
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
 
         return pilot;
     }
 
     public GridPane grantPilotPane() {
-        GridPane grantPilotPane = new GridPane();
-        grantPilotPane.setPadding(new Insets(20, 20, 20, 20));
-        grantPilotPane.setHgap(70);
-        grantPilotPane.setVgap(30);
-
+        GridPane grantPilotPane = getGridPane();
 
         HBox row1 = new HBox(20);
         Label personID = new Label("personID");
@@ -401,36 +785,233 @@ public class AirlineManagement extends Application {
         return grantPilotPane;
     }
 
+    public GridPane assignPilotPane() {
+        GridPane assignPilotPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label personID = new Label("personID");
+        MenuButton personMenu = new MenuButton();
+        ArrayList<String> personList = DatabaseConnect.getPersonID();
+        for (int i = 0; i < personList.size(); i++) {
+            MenuItem personItem = new MenuItem(personList.get(i));
+            personItem.setOnAction(e -> personMenu.setText(personItem.getText()));
+            personMenu.getItems().add(personItem);
+        }
+
+        row1.getChildren().addAll(personID, personMenu);
+
+
+        HBox row2 = new HBox(20);
+        Label flightID = new Label("flightID");
+        MenuButton fIdMenu = new MenuButton();
+        ArrayList<String> fIdList = DatabaseConnect.getFlightID();
+        for (int i = 0; i < fIdList.size(); i++) {
+            MenuItem depItem = new MenuItem(fIdList.get(i));
+            depItem.setOnAction(e -> fIdMenu.setText(depItem.getText()));
+            fIdMenu.getItems().add(depItem);
+        }
+
+        row2.getChildren().addAll(flightID, fIdMenu);
+
+        HBox row3 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(pilot()));
+
+        Button callAddPerson = new Button("Assign");
+        callAddPerson.setPrefSize(200, 50);
+        callAddPerson.setOnAction(e -> {
+
+            try {
+                Object str_personID = personMenu.getText();
+                Object str_flightID = fIdMenu.getText();
+
+                DatabaseConnect.useAssignPilot(str_flightID, str_personID);
+                alert(0, "View Pilot and Person Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct assign_pilot form");
+            }
+
+        });
+
+        row3.getChildren().addAll(cancel, callAddPerson);
+
+
+        assignPilotPane.addRow(0, row1);
+        assignPilotPane.addRow(1, row2);
+        assignPilotPane.addRow(2, row3);
+
+        return assignPilotPane;
+    }
+    public GridPane recycleCrewPane() {
+        GridPane recycleCrewPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        MenuButton fIdMenu = new MenuButton();
+        ArrayList<String> fIdList = DatabaseConnect.getFlightID();
+        for (int i = 0; i < fIdList.size(); i++) {
+            MenuItem depItem = new MenuItem(fIdList.get(i));
+            depItem.setOnAction(e -> fIdMenu.setText(depItem.getText()));
+            fIdMenu.getItems().add(depItem);
+        }
+
+        row1.getChildren().addAll(flightID, fIdMenu);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(pilot()));
+
+        Button callRecycle = new Button("Recycle Crew");
+        callRecycle.setPrefSize(200, 50);
+        callRecycle.setOnAction(e -> {
+
+            try {
+                Object str_flightID = fIdMenu.getText().equals("") ? null : fIdMenu.getText();
+
+                DatabaseConnect.useRecycleCrew(str_flightID);
+                alert(0, "View Person and Pilot Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct recycle_crew() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callRecycle);
+
+        recycleCrewPane.addRow(0, row1);
+        recycleCrewPane.addRow(1, row2);
+
+        return recycleCrewPane;
+    }
+    public GridPane removePilotPane() {
+        GridPane removePilotPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label personID = new Label("personID");
+        MenuButton personMenu = new MenuButton();
+        ArrayList<String> personList = DatabaseConnect.getPersonID();
+        for (int i = 0; i < personList.size(); i++) {
+            MenuItem personItem = new MenuItem(personList.get(i));
+            personItem.setOnAction(e -> personMenu.setText(personItem.getText()));
+            personMenu.getItems().add(personItem);
+        }
+
+        row1.getChildren().addAll(personID, personMenu);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(pilot()));
+
+        Button callremoveP = new Button("Assign");
+        callremoveP.setPrefSize(200, 50);
+        callremoveP.setOnAction(e -> {
+
+            try {
+                Object str_personID = personMenu.getText();
+
+                DatabaseConnect.useRemovePilotRole(str_personID);
+                alert(0, "View Pilot and Pilot_licenses Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct remove_pilot_role form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callremoveP);
+
+
+        removePilotPane.addRow(0, row1);
+        removePilotPane.addRow(1, row2);
+
+        return removePilotPane;
+    }
+
     public GridPane people() {
-        GridPane people = new GridPane();
-        people.setPadding(new Insets(20, 20, 20, 20));
-        people.setHgap(70);
-        people.setVgap(70);
+        GridPane people = getGridPane();
 
         Button add_person = new Button("Add People");
         add_person.setPrefSize(200, 50);
+        Button passBoard = new Button("Passengers Board");
+        passBoard.setPrefSize(200, 50);
+        Button passDisemBark = new Button("Passengers Disembark");
+        passDisemBark.setPrefSize(200, 50);
+        Button removePass = new Button("Remove Passenger Role");
+        removePass.setPrefSize(200, 50);
 
         Button returnBtn = new Button("Return to previous");
         returnBtn.setPrefSize(200, 50);
 
-        people.addRow(0, add_person);
-        people.addRow(1, returnBtn);
+        people.addRow(0, add_person, removePass);
+        people.addRow(1, passBoard, passDisemBark);
+        people.addRow(2, returnBtn);
 
         GridPane addPeoplePane = addPeoplePane();
         Scene addPeopleScene = new Scene(addPeoplePane, 720, 480);
+        GridPane passBoardPane = passBoardPane();
+        Scene passBoardScene = new Scene(passBoardPane, 720, 480);
+        GridPane passDisemBarkPane = passDisemBarkPane();
+        Scene passDisemBarkScene = new Scene(passDisemBarkPane, 720, 480);
+        GridPane removePassPane = removePassPane();
+        Scene removePassScene = new Scene(removePassPane, 720, 480);
 
         Stage primaryStage = stageList.get(0);
         add_person.setOnAction(e -> primaryStage.setScene(addPeopleScene));
+        passBoard.setOnAction(e -> primaryStage.setScene(passBoardScene));
+        passDisemBark.setOnAction(e -> primaryStage.setScene(passDisemBarkScene));
+        removePass.setOnAction(e -> primaryStage.setScene(removePassScene));
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
 
         return people;
     }
+    public GridPane removePassPane() {
+        GridPane removePassPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label personID = new Label("personID");
+        MenuButton personMenu = new MenuButton();
+        ArrayList<String> personList = DatabaseConnect.getPersonID();
+        for (int i = 0; i < personList.size(); i++) {
+            MenuItem personItem = new MenuItem(personList.get(i));
+            personItem.setOnAction(e -> personMenu.setText(personItem.getText()));
+            personMenu.getItems().add(personItem);
+        }
+
+        row1.getChildren().addAll(personID, personMenu);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Cancel");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(people()));
+
+        Button callRemovePassenger = new Button("Remove");
+        callRemovePassenger.setPrefSize(200, 50);
+        callRemovePassenger.setOnAction(e -> {
+
+            try {
+                Object str_personID = personMenu.getText();
+
+                DatabaseConnect.useRemovePassengerRole(str_personID);
+                alert(0, "View Person Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct remove_passenger_role() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callRemovePassenger);
+
+        removePassPane.addRow(0, row1);
+        removePassPane.addRow(1, row2);
+
+        return removePassPane;
+    }
 
     public GridPane addPeoplePane() {
-        GridPane addPeoplePane = new GridPane();
-        addPeoplePane.setPadding(new Insets(20, 20, 20, 20));
-        addPeoplePane.setHgap(70);
-        addPeoplePane.setVgap(30);
+        GridPane addPeoplePane = getGridPane();
 
         HBox row1 = new HBox(20);
         Label personID = new Label("personID");
@@ -524,11 +1105,96 @@ public class AirlineManagement extends Application {
         return addPeoplePane;
     }
 
+    public GridPane passBoardPane() {
+        GridPane passBoardPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        MenuButton fIdMenu = new MenuButton();
+        ArrayList<String> fIdList = DatabaseConnect.getFlightID();
+        for (int i = 0; i < fIdList.size(); i++) {
+            MenuItem depItem = new MenuItem(fIdList.get(i));
+            depItem.setOnAction(e -> fIdMenu.setText(depItem.getText()));
+            fIdMenu.getItems().add(depItem);
+        }
+
+        row1.getChildren().addAll(flightID, fIdMenu);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(people()));
+
+        Button callPassBoard = new Button("Continue");
+        callPassBoard.setPrefSize(200, 50);
+        callPassBoard.setOnAction(e -> {
+
+            try {
+                Object str_flightID = fIdMenu.getText().equals("") ? null : fIdMenu.getText();
+
+                DatabaseConnect.usePassBoard(str_flightID);
+                alert(0, "View Person Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct passengers_board() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callPassBoard);
+
+        passBoardPane.addRow(0, row1);
+        passBoardPane.addRow(1, row2);
+
+        return passBoardPane;
+    }
+
+    public GridPane passDisemBarkPane() {
+        GridPane passDisemBarkPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label flightID = new Label("flightID");
+        MenuButton fIdMenu = new MenuButton();
+        ArrayList<String> fIdList = DatabaseConnect.getFlightID();
+        for (int i = 0; i < fIdList.size(); i++) {
+            MenuItem depItem = new MenuItem(fIdList.get(i));
+            depItem.setOnAction(e -> fIdMenu.setText(depItem.getText()));
+            fIdMenu.getItems().add(depItem);
+        }
+
+        row1.getChildren().addAll(flightID, fIdMenu);
+
+        HBox row2 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(people()));
+
+        Button callPassBoard = new Button("Continue");
+        callPassBoard.setPrefSize(200, 50);
+        callPassBoard.setOnAction(e -> {
+
+            try {
+                Object str_flightID = fIdMenu.getText().equals("") ? null : fIdMenu.getText();
+
+                DatabaseConnect.usePassDisembark(str_flightID);
+                alert(0, "View Person Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct passengers_disembark() form");
+            }
+
+        });
+
+        row2.getChildren().addAll(cancel, callPassBoard);
+
+        passDisemBarkPane.addRow(0, row1);
+        passDisemBarkPane.addRow(1, row2);
+
+        return passDisemBarkPane;
+    }
+
+
+
     public GridPane airport() {
-        GridPane airport = new GridPane();
-        airport.setPadding(new Insets(20, 20, 20, 20));
-        airport.setHgap(70);
-        airport.setVgap(70);
+        GridPane airport = getGridPane();
 
         Button add_airport = new Button("Add Airport");
         add_airport.setPrefSize(200, 50);
@@ -550,10 +1216,7 @@ public class AirlineManagement extends Application {
     }
 
     public GridPane addAirportPane() {
-        GridPane addAirportPane = new GridPane();
-        addAirportPane.setPadding(new Insets(20, 20, 20, 20));
-        addAirportPane.setHgap(70);
-        addAirportPane.setVgap(30);
+        GridPane addAirportPane = getGridPane();
 
         HBox row1 = new HBox(20);
         Label airportID = new Label("airportID");
@@ -632,10 +1295,7 @@ public class AirlineManagement extends Application {
     }
 
     public GridPane airplane() {
-        GridPane airplane = new GridPane();
-        airplane.setPadding(new Insets(20, 20, 20, 20));
-        airplane.setHgap(70);
-        airplane.setVgap(70);
+        GridPane airplane = getGridPane();
 
         Button add_airplane = new Button("Add Airplane");
         add_airplane.setPrefSize(200, 50);
@@ -657,10 +1317,7 @@ public class AirlineManagement extends Application {
     }
 
     public GridPane addAirplanePane () {
-        GridPane addAirplanePane = new GridPane();
-        addAirplanePane.setPadding(new Insets(20, 20, 20, 20));
-        addAirplanePane.setHgap(70);
-        addAirplanePane.setVgap(30);
+        GridPane addAirplanePane = getGridPane();
 
         HBox row1 = new HBox(20);
         Label aID = new Label("airlineID");
@@ -764,6 +1421,331 @@ public class AirlineManagement extends Application {
 
 
         return addAirplanePane;
+    }
+
+    public GridPane ticket() {
+        GridPane airport = getGridPane();
+
+        Button purchaseB = new Button("Purchase Ticket & Seat");
+        purchaseB.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airport.addRow(0, purchaseB);
+        airport.addRow(1, returnBtn);
+
+        GridPane purchaseTicketPane = purchaseTicketPane();
+        Scene purchaseTicketScene = new Scene(purchaseTicketPane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        purchaseB.setOnAction(e -> primaryStage.setScene(purchaseTicketScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return airport;
+    }
+
+    public GridPane purchaseTicketPane() {
+        GridPane purchaseTicketPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label tID = new Label("ticketID");
+        TextField putTicket = new TextField();
+
+        Label seatNum = new Label("seat_num");
+        TextField putSeatNum = new TextField();
+
+        row1.getChildren().addAll(tID, putTicket, seatNum, putSeatNum);
+
+        HBox row2 = new HBox(20);
+        Label cost = new Label("cost");
+        TextField putCost = new TextField();
+
+        row2.getChildren().addAll(cost, putCost);
+
+        HBox row3 = new HBox(20);
+        Label carrier = new Label("carrier");
+        TextField putCarrier = new TextField();
+
+        row3.getChildren().addAll(carrier, putCarrier);
+
+        HBox row4 = new HBox(20);
+        Label customer = new Label("customer");
+        TextField putCustomer = new TextField();
+
+        row4.getChildren().addAll(customer, putCustomer);
+
+        HBox row5 = new HBox(20);
+        Label deplane = new Label("deplane");
+        MenuButton depMenu = new MenuButton();
+        ArrayList<String> depList = DatabaseConnect.getAirportID();
+        for (int i = 0; i < depList.size(); i++) {
+            MenuItem depItem = new MenuItem(depList.get(i));
+            depItem.setOnAction(e -> depMenu.setText(depItem.getText()));
+            depMenu.getItems().add(depItem);
+        }
+
+        row5.getChildren().addAll(deplane, depMenu);
+
+        HBox row6 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(ticket()));
+
+        Button callpurchaseT = new Button("Continue");
+        callpurchaseT.setPrefSize(200, 50);
+        callpurchaseT.setOnAction(e -> {
+
+            try {
+                Object str_ticketID = putTicket.getText().equals("") ? null : putTicket.getText();
+                Object int_cost = putCost.getText().equals("") ? null : Integer.parseInt(putCost.getText());
+                Object str_carrier = putCarrier.getText().equals("") ? null : putCarrier.getText();
+                Object str_customer = putCustomer.getText().equals("") ? null : putCustomer.getText();
+                Object str_deplane = depMenu.getText().equals("") ? null : depMenu.getText();
+                Object str_seatNum = putSeatNum.getText().equals("") ? null : putSeatNum.getText();
+
+                DatabaseConnect.usePurchaseTicket(str_ticketID,int_cost, str_carrier, str_customer, str_deplane, str_seatNum);
+                alert(0, "View Tickets Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct purchase_ticket_and_seat() form");
+            }
+
+        });
+
+        row6.getChildren().addAll(cancel, callpurchaseT);
+
+
+        purchaseTicketPane.addRow(0, row1);
+        purchaseTicketPane.addRow(1, row2);
+        purchaseTicketPane.addRow(2, row3);
+        purchaseTicketPane.addRow(3, row4);
+        purchaseTicketPane.addRow(4, row5);
+        purchaseTicketPane.addRow(5, row6);
+
+
+        return purchaseTicketPane;
+    }
+
+    public GridPane route() {
+        GridPane route = getGridPane();
+
+        Button addLeg = new Button("Add/Update Leg");
+        addLeg.setPrefSize(200, 50);
+        Button startRoute = new Button("Start Route");
+        startRoute.setPrefSize(200, 50);
+        Button extendRoute = new Button("Extend Route");
+        extendRoute.setPrefSize(200, 50);
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        route.addRow(0, addLeg);
+        route.addRow(1, startRoute, extendRoute);
+        route.addRow(2, returnBtn);
+
+        GridPane addLegPane = addLegPane();
+        Scene addLegScene = new Scene(addLegPane, 720, 480);
+        GridPane startRoutePane = startRoutePane();
+        Scene startRouteScene = new Scene(startRoutePane, 720, 480);
+        GridPane extendRoutePane = extendRoutePane();
+        Scene extendRouteScene = new Scene(extendRoutePane, 720, 480);
+
+        Stage primaryStage = stageList.get(0);
+        addLeg.setOnAction(e -> primaryStage.setScene(addLegScene));
+        startRoute.setOnAction(e -> primaryStage.setScene(startRouteScene));
+        extendRoute.setOnAction(e -> primaryStage.setScene(extendRouteScene));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
+
+        return route;
+    }
+
+    public GridPane startRoutePane() {
+        GridPane startRoutePane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label routeID = new Label("routeID");
+        TextField putRouteID = new TextField();
+
+        row1.getChildren().addAll(routeID, putRouteID);
+
+        HBox row2 = new HBox(20);
+        Label legID = new Label("legID");
+        MenuButton legMenu = new MenuButton();
+        ArrayList<String> legList = DatabaseConnect.getLegID();
+        for (int i = 0; i < legList.size(); i++) {
+            MenuItem depItem = new MenuItem(legList.get(i));
+            depItem.setOnAction(e -> legMenu.setText(depItem.getText()));
+            legMenu.getItems().add(depItem);
+        }
+
+        row2.getChildren().addAll(legID, legMenu);
+
+        HBox row3 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(route()));
+
+        Button callSr = new Button("Assign");
+        callSr.setPrefSize(200, 50);
+        callSr.setOnAction(e -> {
+
+            try {
+                Object str_routeID = putRouteID.getText().equals("") ? null : putRouteID.getText();
+                Object str_legID = legMenu.getText().equals("") ? null : legMenu.getText();
+
+                DatabaseConnect.useStartRoute(str_routeID, str_legID);
+                alert(0, "View route and route_path Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct start_route() form");
+            }
+
+        });
+
+        row3.getChildren().addAll(cancel, callSr);
+
+        startRoutePane.addRow(0, row1);
+        startRoutePane.addRow(1, row2);
+        startRoutePane.addRow(2, row3);
+
+
+        return startRoutePane;
+    }
+
+    public GridPane extendRoutePane() {
+        GridPane extendRoutePane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label routeID = new Label("routeID");
+        TextField putRouteID = new TextField();
+
+        row1.getChildren().addAll(routeID, putRouteID);
+
+
+        HBox row2 = new HBox(20);
+        Label legID = new Label("legID");
+        MenuButton legMenu = new MenuButton();
+        ArrayList<String> legList = DatabaseConnect.getLegID();
+        for (int i = 0; i < legList.size(); i++) {
+            MenuItem depItem = new MenuItem(legList.get(i));
+            depItem.setOnAction(e -> legMenu.setText(depItem.getText()));
+            legMenu.getItems().add(depItem);
+        }
+
+        row2.getChildren().addAll(legID, legMenu);
+
+        HBox row3 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(route()));
+
+        Button callEr = new Button("Assign");
+        callEr.setPrefSize(200, 50);
+        callEr.setOnAction(e -> {
+
+            try {
+                Object str_routeID = putRouteID.getText().equals("") ? null : putRouteID.getText();
+                Object str_legID = legMenu.getText().equals("") ? null : legMenu.getText();
+
+                DatabaseConnect.useExtendRoute(str_routeID, str_legID);
+                alert(0, "View route and route_path Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct extend_route() form");
+            }
+
+        });
+
+        row3.getChildren().addAll(cancel, callEr);
+
+        extendRoutePane.addRow(0, row1);
+        extendRoutePane.addRow(1, row2);
+        extendRoutePane.addRow(2, row3);
+
+
+        return extendRoutePane;
+    }
+
+    public GridPane addLegPane() {
+        GridPane addLegPane = getGridPane();
+
+        HBox row1 = new HBox(20);
+        Label lID = new Label("legID");
+        TextField putLegID = new TextField();
+
+        row1.getChildren().addAll(lID, putLegID);
+
+        HBox row2 = new HBox(20);
+        Label distance = new Label("Distance");
+        TextField putDistance = new TextField();
+
+        row2.getChildren().addAll(distance, putDistance);
+
+        HBox row3 = new HBox(20);
+        Label departure = new Label("Departure");
+        MenuButton depMenu = new MenuButton();
+        ArrayList<String> depList = DatabaseConnect.getAirportID();
+        for (int i = 0; i < depList.size(); i++) {
+            MenuItem depItem = new MenuItem(depList.get(i));
+            depItem.setOnAction(e -> depMenu.setText(depItem.getText()));
+            depMenu.getItems().add(depItem);
+        }
+
+        row3.getChildren().addAll(departure, depMenu);
+
+        HBox row4 = new HBox(20);
+        Label arrival = new Label("Arrival");
+        MenuButton arrMenu = new MenuButton();
+        ArrayList<String> arrList = DatabaseConnect.getAirportID();
+        for (int i = 0; i < arrList.size(); i++) {
+            MenuItem arrItem = new MenuItem(arrList.get(i));
+            arrItem.setOnAction(e ->arrMenu.setText(arrItem.getText()));
+            arrMenu.getItems().add(arrItem);
+        }
+
+        row4.getChildren().addAll(arrival, arrMenu);
+
+        HBox row5 = new HBox(20);
+        Button cancel = new Button("Return to previous");
+        cancel.setPrefSize(200, 50);
+        cancel.setOnAction(e -> cancel.getScene().setRoot(route()));
+
+        Button callAddLeg = new Button("Assign");
+        callAddLeg.setPrefSize(200, 50);
+        callAddLeg.setOnAction(e -> {
+
+            try {
+                Object str_legID = putLegID.getText().equals("") ? null : putLegID.getText();
+                Object int_distance = putDistance.getText().equals("") ? null : Integer.parseInt(putDistance.getText());
+                Object str_departure = depMenu.getText().equals("") ? null : depMenu.getText();
+                Object str_arrival = arrMenu.getText().equals("") ? null : arrMenu.getText();
+
+                DatabaseConnect.useAddUpdateLeg(str_legID,int_distance, str_departure, str_arrival);
+                alert(0, "View Routes Table to check the update");
+            } catch (Exception exception) {
+                alert(1, "Retry with correct add_update_leg() form");
+            }
+
+        });
+
+        row5.getChildren().addAll(cancel, callAddLeg);
+
+
+        addLegPane.addRow(0, row1);
+        addLegPane.addRow(1, row2);
+        addLegPane.addRow(2, row3);
+        addLegPane.addRow(3, row4);
+        addLegPane.addRow(4, row5);
+
+
+        return addLegPane;
+    }
+
+    public GridPane getGridPane() {
+        GridPane newGridPane = new GridPane();
+        newGridPane.setPadding(new Insets(20, 20, 20, 20));
+        newGridPane.setHgap(70);
+        newGridPane.setVgap(30);
+        newGridPane.setAlignment(Pos.CENTER);
+        return newGridPane;
     }
 
     public void alert(int type, String message) {
