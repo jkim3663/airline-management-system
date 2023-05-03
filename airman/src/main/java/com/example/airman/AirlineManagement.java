@@ -170,13 +170,56 @@ public class AirlineManagement extends Application {
     public GridPane viewTablePane() {
         GridPane viewTablePane = getGridPane();
 
-        Button airline = new Button("Airline Table");
+        Button airline = new Button("Airline");
         airline.setPrefSize(200, 50);
+
+        Button airplane = new Button("Airplane");
+        airplane.setPrefSize(200, 50);
+
+        Button airport = new Button("Airport");
+        airport.setPrefSize(200, 50);
+
+        Button location = new Button("Location");
+        location.setPrefSize(200, 50);
+
+        Button flight = new Button("Flight");
+        flight.setPrefSize(200, 50);
+
+        Button person = new Button("Person");
+        person.setPrefSize(200, 50);
+
+        Button pilot = new Button("Pilot");
+        pilot.setPrefSize(200, 50);
+
+        Button pLicense = new Button("Pilot License");
+        pLicense.setPrefSize(200, 50);
+
+        Button passenger = new Button("Passenger");
+        passenger.setPrefSize(200, 50);
+
+        Button leg = new Button("Leg");
+        leg.setPrefSize(200, 50);
+
+        Button route = new Button("Route");
+        route.setPrefSize(200, 50);
+
+        Button route_path = new Button("Route Path");
+        route_path.setPrefSize(200, 50);
+
+        Button ticket = new Button("Ticket");
+        ticket.setPrefSize(200, 50);
+
+        Button ticket_seats = new Button("Ticket Seats");
+        ticket_seats.setPrefSize(200, 50);
 
         Button returnBtn = new Button("Return to previous");
         returnBtn.setPrefSize(200, 50);
 
-        viewTablePane.addRow(0, airline);
+        viewTablePane.addRow(0, airline, airplane, airport);
+        viewTablePane.addRow(1, location, flight, person);
+        viewTablePane.addRow(2, passenger, pilot, pLicense);
+        viewTablePane.addRow(3, leg, route, route_path);
+        viewTablePane.addRow(4, ticket, ticket_seats, returnBtn);
 
         viewTablePane.setAlignment(Pos.CENTER);
 
@@ -185,7 +228,60 @@ public class AirlineManagement extends Application {
         ScrollPane airlinePane = airlineTable();
         Scene airlineScene = new Scene(airlinePane, 720, 480);
 
+        ScrollPane airplanePane = airplaneTable();
+        Scene airplaneScene = new Scene(airplanePane, 720, 480);
+
+        ScrollPane airportPane = airportTable();
+        Scene airportScene = new Scene(airportPane, 720, 480);
+
+        ScrollPane locationPane = createTable("location");
+        Scene locationScene = new Scene(locationPane, 720, 480);
+
+        ScrollPane flightPane = flightTable();
+        Scene flightScene = new Scene(flightPane, 720, 480);
+
+        ScrollPane personPane = personTable();
+        Scene personScene = new Scene(personPane, 720, 480);
+
+        ScrollPane pilotPane = createTable("pilot");
+        Scene pilotScene = new Scene(pilotPane, 720, 480);
+
+        ScrollPane pLicensePane = createTable("pilot_licenses");
+        Scene pLicenseScene = new Scene(pLicensePane, 720, 480);
+
+        ScrollPane passengerPane = createTable("passenger");
+        Scene passScene = new Scene(passengerPane, 720, 480);
+
+        ScrollPane legPane = createTable("leg");
+        Scene legScene = new Scene(legPane, 720, 480);
+
+        ScrollPane routePane = createTable("route");
+        Scene routeScene = new Scene(routePane, 720, 480);
+
+        ScrollPane routePathPane = createTable("route_path");
+        Scene routePathScene = new Scene(routePathPane, 720, 480);
+
+        ScrollPane ticketPane = createTable("ticket");
+        Scene ticketScene = new Scene(ticketPane, 720, 480);
+
+        ScrollPane ticketSeatPane = createTable("ticket_seats");
+        Scene ticketSeatScene = new Scene(ticketSeatPane, 720, 480);
+
         airline.setOnAction(e -> primaryStage.setScene(airlineScene));
+        airplane.setOnAction(e -> primaryStage.setScene(airplaneScene));
+        airport.setOnAction(e -> primaryStage.setScene(airportScene));
+        location.setOnAction(e -> primaryStage.setScene(locationScene));
+        flight.setOnAction(e -> primaryStage.setScene(flightScene));
+        person.setOnAction(e -> primaryStage.setScene(personScene));
+        pilot.setOnAction(e -> primaryStage.setScene(pilotScene));
+        pLicense.setOnAction(e -> primaryStage.setScene(pLicenseScene));
+        passenger.setOnAction(e -> primaryStage.setScene(passScene));
+        leg.setOnAction(e -> primaryStage.setScene(legScene));
+        route.setOnAction(e -> primaryStage.setScene(routeScene));
+        route_path.setOnAction(e -> primaryStage.setScene(routePathScene));
+        ticket.setOnAction(e -> primaryStage.setScene(ticketScene));
+        ticket_seats.setOnAction(e -> primaryStage.setScene(ticketSeatScene));
+
         returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(menuScene()));
 
         return viewTablePane;
@@ -365,6 +461,161 @@ public class AirlineManagement extends Application {
         return scrollPane;
     }
 
+    public ScrollPane createTable(String tbname) {
+        GridPane p = new GridPane();
+        p.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String >> tableValues = DatabaseConnect.getTable(tbname);
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                p.getChildren().add(box);
+            }
+        }
+
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        p.addRow(p.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(p);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewTablePane()));
+
+        return scrollPane;
+    }
+
+
+    public ScrollPane personTable() {
+        GridPane airportPane = new GridPane();
+        airportPane.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String >> tableValues = DatabaseConnect.getTable("person");
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                airportPane.getChildren().add(box);
+            }
+        }
+
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airportPane.addRow(airportPane.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(airportPane);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewTablePane()));
+
+        return scrollPane;
+    }
+
+
+    public ScrollPane flightTable() {
+        GridPane airportPane = new GridPane();
+        airportPane.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String >> tableValues = DatabaseConnect.getTable("flight");
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                airportPane.getChildren().add(box);
+            }
+        }
+
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airportPane.addRow(airportPane.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(airportPane);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewTablePane()));
+
+        return scrollPane;
+    }
+
+
+    public ScrollPane airportTable() {
+        GridPane airportPane = new GridPane();
+        airportPane.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String >> tableValues = DatabaseConnect.getTable("airport");
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                airportPane.getChildren().add(box);
+            }
+        }
+
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airportPane.addRow(airportPane.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(airportPane);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewTablePane()));
+
+        return scrollPane;
+    }
+
+
+    public ScrollPane airplaneTable() {
+        GridPane airplanePane = new GridPane();
+        airplanePane.setPadding(new Insets(50, 50, 50, 50));
+
+        ArrayList<ArrayList<String >> tableValues = DatabaseConnect.getTable("airplane");
+        for (int i = 0; i < tableValues.size(); i ++) {
+            for (int j = 0; j < tableValues.get(0).size(); j++) {
+                StackPane box = new StackPane();
+                box.setStyle("-fx-border-width: 1;" + "-fx-border-color: black;"
+                        + "-fx-padding: 5;" + "-fx-background-color: transparent;");
+                Label lb = new Label(tableValues.get(i).get(j));
+                box.getChildren().add(lb);
+                GridPane.setConstraints(box, j, i);
+                airplanePane.getChildren().add(box);
+            }
+        }
+
+
+        Button returnBtn = new Button("Return to previous");
+        returnBtn.setPrefSize(200, 50);
+
+        airplanePane.addRow(airplanePane.getRowCount(), returnBtn);
+
+        ScrollPane scrollPane = makeScrollPane(airplanePane);
+
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewTablePane()));
+
+        return scrollPane;
+    }
+
+
     public ScrollPane airlineTable() {
         GridPane airlinePane = new GridPane();
         airlinePane.setPadding(new Insets(50, 50, 50, 50));
@@ -390,7 +641,7 @@ public class AirlineManagement extends Application {
 
         ScrollPane scrollPane = makeScrollPane(airlinePane);
 
-        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewSimPane()));
+        returnBtn.setOnAction(e -> returnBtn.getScene().setRoot(viewTablePane()));
 
         return scrollPane;
     }

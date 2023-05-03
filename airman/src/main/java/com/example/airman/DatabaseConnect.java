@@ -943,6 +943,5 @@ public class DatabaseConnect {
 
     public static void main(String[] args) {
         getLocationID();
-        getTable("airplane");
     }
 }
