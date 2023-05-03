@@ -8,24 +8,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.example.airman.DatabaseConnect;
 
-
-public class AirlineManagement extends Application {
+public class AirlineMangement extends Application {
     // 0: main menu scene
     // 1: Airplane menu scene
     // 2: Pilot menu scene
@@ -680,7 +673,7 @@ public class AirlineManagement extends Application {
         GridPane peopleInAir = new GridPane();
         peopleInAir.setPadding(new Insets(50, 50, 50, 50));
 
-        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getPeopleInTheGround();
+        ArrayList<ArrayList<String>> tableValues = DatabaseConnect.getPeopleInTheAir();
         for (int i = 0; i < tableValues.size(); i ++) {
             for (int j = 0; j < tableValues.get(0).size(); j++) {
                 StackPane box = new StackPane();
@@ -1698,22 +1691,38 @@ public class AirlineManagement extends Application {
 
             try {
                 Object airplaneID = aIDList.getText().equals("") ? null : aIDList.getText();
+                System.out.println(airplaneID);
+
                 Object plane_type = pType.getText().equals("") ? null : pType.getText();
+                System.out.println(plane_type);
+
                 Object tail_num = tNum.getText().equals("") ? null : tNum.getText();
-                Object getSkidText = skidText.getText().equals("") ? null : skidText.getText();
+                System.out.println(tail_num);
+
                 Object skidVal;
-                if ( getSkidText.equals("True") || getSkidText.equals("true") || getSkidText.equals("TRUE") ) {
-                    skidVal = true;
-                } else if (getSkidText.equals("False") || getSkidText.equals("false") || getSkidText.equals("FALSE")) {
-                    skidVal = false;
-                } else {
+                if (skidText.getText().equals("")) {
                     skidVal = null;
+                } else if (skidText.equals("True") || skidText.equals("true") || skidText.equals("TRUE") ) {
+                    skidVal = true;
+                } else {        // if (skidText.equals("False") || skidText.equals("false") || skidText.equals("FALSE"))
+                    skidVal = false;
                 }
+                System.out.println(skidVal);
+
                 Object seat_capacity = seatCapNum.getText().equals("") ? null : Integer.parseInt(seatCapNum.getText());
+                System.out.println(seat_capacity);
+
                 Object propVal = prop.getText().equals("") ? null : Integer.parseInt(prop.getText());
+                System.out.println(propVal);
+
                 Object speedVal = speedNum.getText().equals("") ? null : Integer.parseInt(speedNum.getText());
+                System.out.println(speedVal);
+
                 Object jet_engines = jetNum.getText().equals("") ? null :Integer.parseInt(jetNum.getText());
+                System.out.println(jet_engines);
+
                 String location_id = locMenu.getText().equals("") ? null : locMenu.getText();
+                System.out.println(location_id);
 
 
                 DatabaseConnect.useAddAirplane(airplaneID, tail_num, seat_capacity, speedVal, location_id, plane_type,
